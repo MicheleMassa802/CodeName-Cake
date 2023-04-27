@@ -8,10 +8,12 @@ Also, I didn't want to over complicate what I want to be one of my first continu
 ## Stages:
 - Setup & Brainstorm (2023-04-26 - 2023-04-26)
 
-- Details (2023-04-27 - )
+- Details (2023-04-27 - 2023-04-27)
 
-- TechStack & Arch (2023-04-27 - )
+- Learning React Native (2023-04-27 - ...)
 
-- Start Project (2023-04-27 - )
+- TechStack & Arch (... - ...)
+
+- Start Project (... - ...)
 
 
