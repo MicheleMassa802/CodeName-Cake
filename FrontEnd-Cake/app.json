@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Cake",
-    "slug": "Cake",
+    "name": "FrontEnd-Cake",
+    "slug": "FrontEnd-Cake",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
