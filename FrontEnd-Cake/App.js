@@ -1,20 +1,36 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StatusBar as ExpoStatusBar} from 'expo-status-bar';
+import { SafeAreaView, StyleSheet, Platform, StatusBar } from 'react-native';
+import WelcomeScreen from './app/screens/WelcomeScreen';
+import LoginScreen from './app/screens/LoginScreen';
+import RegisterScreen from './app/screens/RegisterScreen';
+import HomeScreen from './app/screens/HomeScreen';
+import StatsScreen from './app/screens/StatsScreen';
+import ViewOrdersScreen from './app/screens/ViewOrdersScreen';
+import CalendarScreen from './app/screens/CalendarScreen';
 
 export default function App() {
+
+  console.log(StatusBar.currentHeight);
+
+  const styles = StyleSheet.create({
+    safeContainer: {
+      flex: 1,
+      backgroundColor: 'white',
+      paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0
+    }
+  });
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaView style={styles.safeContainer}>
+      {/* <WelcomeScreen /> */}
+      {/* <RegisterScreen/> */}
+      {/* <LoginScreen/> */}
+      {/* <HomeScreen/> */}
+      {/* <StatsScreen/> */}
+      {/* <ViewOrdersScreen/> */}
+      <CalendarScreen/>
+    </SafeAreaView>
+
+    // <RegisterScreen/>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
