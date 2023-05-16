@@ -9,6 +9,7 @@ function CalendarScreen(props) {
     // for month-year handler
     const [month, setMonth] = useState(new Date().getMonth()); // [0, 11] 
     const [year, setYear] = useState(new Date().getFullYear());  // XXXX
+    const [day, setDay] = useState(new Date().getDate()); // [1, 31]
 
     const mayOrders = {  // youd get this in a per month basis
         1: [  // key is the day of the month
@@ -19,6 +20,14 @@ function CalendarScreen(props) {
             {
                 id: 18,
                 name: "Jane's baptism Cupcakes",
+            },
+            {
+                id: 19,
+                name: "Laura's Wedding Cake",
+            },
+            {
+                id: 20,
+                name: "Rigobertha's Birthday Cake",
             }, // value is the object with order name and id (to find the order in the database)
         ],
         2: [],
@@ -29,7 +38,16 @@ function CalendarScreen(props) {
         7: [],
         8: [],
         9: [],
-        10:[],
+        10:[
+            {
+                id: 25,
+                name: "Tiff Cupcakes",
+            },
+            {
+                id: 26,
+                name: "Giveaway Cookies",
+            },
+        ],
         11:[],
         12:[],
         13:[],
@@ -58,7 +76,22 @@ function CalendarScreen(props) {
         31:[],      
     }
 
-    console.log(mayOrders[1]);
+    const datePressed = (date) => {
+        console.log("Pressed on day " + date + " of " + utils.monthMap[month] + " " + year);
+        setDay(date);
+    }
+
+    const determineColor = (date) => {
+        if (mayOrders[date].length == 0) {
+            return colors.green;
+        } else if (mayOrders[date].length < 2) {
+            return colors.yellow;
+        } else if (mayOrders[date].length < 4) {
+            return colors.orange;
+        } else {
+            return colors.red;
+        }
+    }
 
 
     return (
@@ -88,17 +121,26 @@ function CalendarScreen(props) {
                 </TouchableOpacity>
             </View>
 
-            <View style = {styles.content}>
-                <ScrollView>
+            <View style = {styles.calendarSection}>
+                <ScrollView contentContainerStyle={styles.content}>
                     {/* 4 cells wide, up to 8 tall */}
                     {Object.keys(mayOrders).map((day) => (
-                        <View key={day} style = {styles.cell}>
-                            <Text style={font_styles.subtitle}> {day} </Text>
-                        </View>
+                        <TouchableOpacity key={day} style = {[styles.cell, , {backgroundColor: determineColor(day)}]} onPress={() => datePressed(day)}>
+                            <Text style={[font_styles.dates, {backgroundColor: determineColor(day)}]}> {day + ": "} </Text>
+                            <Text style={styles.events}> {+ mayOrders[day].length} items </Text>
+                        </TouchableOpacity>
                     ))}
                 </ScrollView>
             </View>
 
+            <View style = {styles.dateContent}>
+                <ScrollView>
+                    <Text style={styles.dateContentTitle}> {"Orders for " + utils.monthMap[month] + " " + day + ", " + year} </Text>
+                    {mayOrders[day].length == 0 ?
+                        <Text style={styles.dateContentText}> {"No orders for this day"} </Text> :
+                        mayOrders[day].map((order) => (<Text style={styles.dateContentText}> {"-> " + order.name} </Text>))}
+                </ScrollView>
+            </View>
         </View>
     );
 }
@@ -110,15 +152,8 @@ const styles = StyleSheet.create({
         marginVertical: 20,
     },
 
-    half: {
-        flex: 1,
-        alignContent: 'center',
-        justifyContent: 'flex-start',
-
-    },
-
     titleBar: {
-        flex: 1,
+        flex: 0.8,
         backgroundColor: colors.primary_default,
         borderBottomWidth: 4,
         borderColor: colors.darker_secondary,
@@ -126,20 +161,17 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
 
-    content: {
-        flex: 7,
-        margin: 20,
-    },
-
     controlBar: {
-        flex: 1.25,
+        flex: 0.6,
         flexDirection: 'row',
         backgroundColor: colors.primary_default,
         justifyContent: 'space-evenly',
         alignItems: 'center',
         // borderTopWidth: 4,
-        borderBottomWidth: 4,
-        borderColor: colors.darker_secondary,
+        borderWidth: 2,
+        borderColor: colors.black,
+        margin: 9,
+        marginTop: 20,
     },
 
     button: {
@@ -159,19 +191,56 @@ const styles = StyleSheet.create({
         width: '10%',
     },
 
-    cell: {
-        flex: 1,
-        borderWidth: 1,
+    calendarSection: {
+        flex: 5,
+        margin: 9,
+        borderWidth: 2,
     },
 
-    innerContent: {
+    content: {
         flex: 1,
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+    },
+
+    cell: {
+        flexDirection: 'row',
+        width: '25%',
+        height: '12.5%',
+        borderWidth: 1,
+        borderColor: colors.black,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+
+    events: {
+        flex: 1,
+        fontSize: 11,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+
+    dateContent: {
+        flex: 3,
+        margin: 9,
+        borderWidth: 2,
+    },
+
+    dateContentTitle: {
+        fontSize: 22,
+        fontWeight: "bold",
+        textAlign: "center",
+        borderBottomColor: colors.darker_secondary,
+        borderBottomWidth: 2,
+        backgroundColor: colors.primary_default,
+    }, 
+
+    dateContentText: {
         fontSize: 16,
         fontWeight: "normal",
-        color: colors.black,
-        textAlign: "center",
+        flex: 1,
+        marginTop: 8,
     },
-
 });
 
 export default CalendarScreen;

@@ -7,6 +7,7 @@ import HomeScreen from './app/screens/HomeScreen';
 import StatsScreen from './app/screens/StatsScreen';
 import ViewOrdersScreen from './app/screens/ViewOrdersScreen';
 import CalendarScreen from './app/screens/CalendarScreen';
+import AddOrderScreen from './app/screens/AddOrderScreen';
 
 export default function App() {
 
@@ -28,7 +29,8 @@ export default function App() {
       {/* <HomeScreen/> */}
       {/* <StatsScreen/> */}
       {/* <ViewOrdersScreen/> */}
-      <CalendarScreen/>
+      {/* <CalendarScreen/> */}
+      <AddOrderScreen/>
     </SafeAreaView>
 
     // <RegisterScreen/>

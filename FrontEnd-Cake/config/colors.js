@@ -21,5 +21,12 @@ export default {
 	house_fill: '#f5f5dc',
 	roof_outline: '#732013',
 	roof_fill: '#bc4a3c',
+
+	// colors for events
+	green: '#a0b6aa',
+	yellow: '#eae8ae',
+	orange: '#e79c74',
+	red: '#c36666',
+
 	
 }

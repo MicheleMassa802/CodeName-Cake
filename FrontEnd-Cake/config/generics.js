@@ -52,7 +52,14 @@ const font_styles = StyleSheet.create({
         textAlign: "center",
         color: colors.darker_secondary,
 
-    }
+    },
+
+    dates: {
+        fontSize: 18,
+        fontWeight: "bold",
+        // fontFamily: "Inconsolata",
+        backgroundColor: colors.secondary,
+    },
     
 });
 
