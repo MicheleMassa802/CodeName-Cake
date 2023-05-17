@@ -18,6 +18,9 @@ const monthMap = {
 const maxYear = new Date().getFullYear() + 3;
 const minYear = 2023; // application release date
 
+const maxDate = `${maxYear}-12-31`;
+const minDate = `${minYear}-01-01`;
+
 const prevMonth = (monthInt) => {
   console.log("Prev Month");
   if (monthInt !== 0) {
@@ -60,4 +63,6 @@ export default {
   nextMonth,
   prevYear,
   nextYear,
+  maxDate,
+  minDate
 };
