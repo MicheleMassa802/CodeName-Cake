@@ -1,41 +1,112 @@
 import {React, useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text, TouchableOpacity, Pressable, Platform, ScrollView } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { View, TextInput, Button, StyleSheet, Text, TouchableOpacity, ScrollView } from 'react-native';
 import colors from '../../config/colors';
 import font_styles from '../../config/generics';
-import utils from '../../config/calendarUtil';
 
 
-function AddOrderScreen(props) {
+function AddOrderFurtherDetailsScreen(props) {
+
+    // constant controlling whether this page is being displayed for creation of a new order or editing of an existing one
+    const editing = false;
+    const existingOrderDetails = {
+        "Cake Tier #0" : {
+            tierSize: "6 inch",
+            tierCakeFlavor: "Chocolate",
+            tierFillingFlavor: "Vanilla",
+            tierFrostingFlavor: "Chocolate",
+            fondant: "Yes",
+        },
+        "Cake Tier #1" : {
+            tierSize: "8 inch",
+            tierCakeFlavor: "Vanilla",
+            tierFillingFlavor: "Chocolate",
+            tierFrostingFlavor: "Vanilla",
+            fondant: "No",
+        },
+        "Cake Decoration #0" : {
+            decorationType: "Flowers",
+            numberOfDecorations: "10",
+            decorationDescription: "Pink and White",
+        },
+    };
+
+    // constant structures
+    const orderTypes = [
+        "Cake",
+        "Cookies", 
+        "Cupcakes", 
+        "Other"
+    ];
+
+    const detailObjects = {
+        "Cake Tier" : {
+            tierSize: "",
+            tierCakeFlavor: "",
+            tierFillingFlavor: "",
+            tierFrostingFlavor: "",
+            fondant: "",
+        },
+        "Cake Decoration" : {
+            decorationType: "",
+            numberOfDecorations: "",
+            decorationDescription: "",
+        },
+        "Cookie Batch" : {
+            cookieType: "",
+            cookieNumber: "",
+            cookieFlavor: "",
+            cookieFilling: "",
+            cookieDecoration: "",
+        },
+        "Cupcake Batch" : {
+            cupcakeType: "",
+            cupcakeNumber: "",
+            cupcakeFlavor: "",
+            cupcakeFilling: "",
+            cupcakeFrosting: "",
+            cupcakeDecoration: "",
+        },
+        "Custom Detail" : {
+            type: "",
+            number: "",
+            description: "",
+        },
+    };
+    const detailTypes = Object.keys(detailObjects);
+    const chosenOrderType = orderTypes[2];
+
 
     // should know
     const orderName = "<Order Name>";
 
     // States
-    const [orderDetails, setOrderDetails] = useState([]);
+    const [orderDetails, setOrderDetails] = useState(editing ? existingOrderDetails : {});
+    const [orderTypeCounter, setOrderTypeCounter] = useState([0, 0, 0, 0, 0]);
     
     console.log(orderDetails);
 
     // Functions
-    const addOrderDetail = () => {
-        // function to leave the rest of the order and order details as is and only add a new order detail
-        // to the list
-        setOrder((prevOrder) => ({
-        ...prevOrder,
-        orderDetails: [
-            ...prevOrder.orderDetails,
-            { field1: '', field2: '', field3: '' }, // Replace with your desired fields
-        ],
-        }));
+    const addOrderDetail = (detailType) => {
+        // detailType MUST be one of the keys in detailObjects
+        const key = detailType + " #" + orderTypeCounter[detailTypes.indexOf(detailType)];
+        
+        // update the counter for the detailType
+        const updatedOrderTypeCounter = [...orderTypeCounter];
+        updatedOrderTypeCounter[detailTypes.indexOf(detailType)] += 1;
+        setOrderTypeCounter(updatedOrderTypeCounter);
+        
+        // add the detail to the orderDetails
+        const updatedOrderDetails = {...orderDetails};
+        updatedOrderDetails[key] = detailObjects[detailType];
+        console.log(updatedOrderDetails);
+        console.log(key);
+        setOrderDetails(updatedOrderDetails);
     };
 
-    const handleOrderDetailChange = (index, field, value) => {
-        setOrder((prevOrder) => ({
-            ...prevOrder,
-            orderDetails: prevOrder.orderDetails.map((detail, i) =>
-            i === index ? { ...detail, [field]: value } : detail
-            ),
-        }));
+    const handleOrderDetailChange = (key, field, value) => {
+        const updatedOrderDetails = {...orderDetails};
+        updatedOrderDetails[key][field] = value;
+        setOrderDetails(updatedOrderDetails);
     };
 
     const finishOrder = () => {
@@ -47,36 +118,72 @@ function AddOrderScreen(props) {
         <View style={styles.container}>
 
             <View style = {styles.titleBar}>
-                <Text style={font_styles.title}> Order {orderName} Details </Text>
+                <Text style={font_styles.title}> {editing ? "Editing" : "Creating"} Order {orderName} Details </Text>
             </View>
             
             <View style = {styles.detailSection}>
                 <ScrollView style={{flex: 1}}>
-                    {/* Example: Render order details */}
-                    {orderDetails.map((detail, index) => (
-                    <View key={index}>
-                        <TextInput
-                        placeholder="Field 1"
-                        value={detail.field1}
-                        onChangeText={(value) =>
-                            handleOrderDetailChange(index, 'field1', value)
-                        }
-                        />
-                        <TextInput
-                        placeholder="Field 2"
-                        value={detail.field2}
-                        onChangeText={(value) =>
-                            handleOrderDetailChange(index, 'field2', value)
-                        }
-                        />
-                        {/* Add more text inputs for other fields */}
+                    {Object.entries(orderDetails).map(([key, value]) => (
+                    <View key={key} style={{marginBottom: 20}}>
+                        <Text style={font_styles.subtitle}> {key} </Text>
+                        {Object.keys(value).map((field, index) => (
+                            <View key={`${key}-order-field-${field}-${index}`} style={styles.orderInput}>
+                                <Text style={styles.label}>{field}</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder={field}
+                                    value={value[field]}
+                                    onChangeText={(value) =>
+                                        handleOrderDetailChange(key, field, value)
+                                    }
+                                    multiline={true}
+                                    scrollEnabled={true}
+                                />
+                            </View>
+                        ))}
                     </View>
                     ))}
                 </ScrollView>
+                
+                {chosenOrderType === orderTypes[0] && 
+                (
+                <View style={styles.addButtonSection}>
+                    <TouchableOpacity style={[styles.addDetailButton, {borderRightWidth: 2}]} onPress={() => addOrderDetail(detailTypes[0])}>
+                        <Text style={font_styles.body}> Add Cake Tier </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.addDetailButton} onPress={() => addOrderDetail(detailTypes[1])}>
+                        <Text style={font_styles.body}> Add Cake Decoration </Text>
+                    </TouchableOpacity>
+                </View>
+                )}
+                
+                {chosenOrderType === orderTypes[1] && 
+                (
+                <View style={styles.addButtonSection}>
+                    <TouchableOpacity style={styles.addDetailButton} onPress={() => addOrderDetail(detailTypes[2])}>
+                        <Text style={font_styles.subtitle}> Add Cookie Batch </Text>
+                    </TouchableOpacity>
+                </View>
+                )}
 
-                <TouchableOpacity style={styles.addDetailButton} onPress={finishOrder}>
-                    <Text style={font_styles.subtitle}> Add Detail </Text>
-                </TouchableOpacity>
+                {chosenOrderType === orderTypes[2] && 
+                (
+                <View style={styles.addButtonSection}>
+                    <TouchableOpacity style={styles.addDetailButton} onPress={() => addOrderDetail(detailTypes[3])}>
+                        <Text style={font_styles.subtitle}> Add Cupcake Batch </Text>
+                    </TouchableOpacity>
+                </View>
+                )}
+
+                {chosenOrderType === orderTypes[3] && 
+                (
+                <View style={styles.addButtonSection}>
+                    <TouchableOpacity style={styles.addDetailButton} onPress={() => addOrderDetail(detailTypes[4])}>
+                        <Text style={font_styles.subtitle}> Add Custom Order Detail </Text>
+                    </TouchableOpacity>
+                </View>
+                )}  
+                
             </View>
     
             <TouchableOpacity style={styles.finishButton} onPress={finishOrder}>
@@ -145,6 +252,7 @@ const styles = StyleSheet.create({
     },
 
     input: {
+        width: '50%',
         borderWidth: 1,
         borderColor: colors.darker_secondary,
         padding: 5,
@@ -152,8 +260,13 @@ const styles = StyleSheet.create({
         borderRadius: 5,
     },
 
-    addDetailButton: {
+    addButtonSection: {
         flex: 0.08,
+        flexDirection: 'row',
+    },
+
+    addDetailButton: {
+        flex: 1,
         backgroundColor: colors.secondary,
         justifyContent: 'center',
         alignItems: 'center',
@@ -175,4 +288,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default AddOrderScreen;
+export default AddOrderFurtherDetailsScreen;

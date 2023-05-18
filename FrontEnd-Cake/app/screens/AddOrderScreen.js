@@ -8,14 +8,26 @@ import utils from '../../config/calendarUtil';
 
 function AddOrderScreen(props) {
 
+    // constant controlling whether this page is being displayed for creation of a new order or editing of an existing one
+    const editing = true;
+    const existingOrder = {
+        orderName: "<Order Name>",
+        deliveryDate: new Date(),
+        clientContact: "<Client Contact>",
+        extraNotes: "<Extra Notes>",
+        estimatedCost: "<Estimated Cost>",
+        orderType: "Cake",
+    };
+
+
     // States
     const [order, setOrder] = useState({
-        orderName: '',
-        deliveryDate: new Date(),
-        clientContact: '',
-        extraNotes: '',
-        estimatedCost: '',
-        orderType: '',
+        orderName: editing ? existingOrder.orderName : "",
+        deliveryDate: editing ? existingOrder.deliveryDate : new Date(),
+        clientContact: editing ? existingOrder.clientContact : "",
+        extraNotes: editing ? existingOrder.extraNotes : "",
+        estimatedCost: editing ? existingOrder.estimatedCost : "",
+        orderType: editing ? existingOrder.orderType : "",
         // orderDetails: [],
     });
     const [showDatePicker, setShowDatePicker] = useState(false);
@@ -62,7 +74,7 @@ function AddOrderScreen(props) {
             {/* Actual Screen to Display */}
 
             <View style = {styles.titleBar}>
-                <Text style={font_styles.title}> Place Order </Text>
+                <Text style={font_styles.title}> {editing ? "Edit Order" : "Place Order"} </Text>
             </View>
 
             <View style={styles.detailSection}>
@@ -146,8 +158,8 @@ function AddOrderScreen(props) {
                         <Text style={font_styles.body}> {"Cookies"} </Text>
                     </TouchableOpacity>
                     <TouchableOpacity style = {[styles.button,
-                        {backgroundColor: order.orderType === "Cupcake" ? colors.primary_default : colors.secondary}]} onPress={() => handleInputChange('orderType', 'Cupcake')}>
-                        <Text style={font_styles.body}> {"Cupcake"} </Text>
+                        {backgroundColor: order.orderType === "Cupcakes" ? colors.primary_default : colors.secondary}]} onPress={() => handleInputChange('orderType', 'Cupcakes')}>
+                        <Text style={font_styles.body}> {"Cupcakes"} </Text>
                     </TouchableOpacity>
                     <TouchableOpacity style = {[styles.button,
                         {backgroundColor: order.orderType === "Other" ? colors.primary_default : colors.secondary}]} onPress={() => handleInputChange('orderType', 'Other')}>
