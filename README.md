@@ -127,8 +127,10 @@ Order Management System mobile application hosted through a react native front e
 
 - Start Project (2023-05-08 -> ...)
 
-  - Front End (React Native) (2023-05-08 -> ...)
+  - Front End (React Native) (2023-05-08 -> 2023-05-21) Finished Screens, now onto the backend
   - Back End (Spring Boot) (... -> ...)
+  - Front End & Back End Connection (Fetch requests for all screens that need them) (... -> ...)
+  - Front End (React Native) app structure tree (for moving between screens) (... -> ...)
 
 - Testing (... -> ...)
 
