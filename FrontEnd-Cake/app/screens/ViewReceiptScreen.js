@@ -52,6 +52,9 @@ function ViewReceiptScreen(props) {
         return day + "-" + month + "-" + year;
     }
 
+    const chainedOrder = true; // true if the attachedOrder field in the order object is not null
+    // means that another screen with the following suborder details should be displayed too
+
 
     // Screen
     return (
@@ -94,6 +97,13 @@ function ViewReceiptScreen(props) {
                         ))}
                     </ScrollView>
                 </View>
+
+                {chainedOrder && (
+                    <TouchableOpacity style={styles.button} onPress={() => console.log("Onto the attached order")}>
+                        <Text style={font_styles.subtitle}> View Attached Order </Text>
+                    </TouchableOpacity>
+                )}
+
                 
             </View>
         </View>
@@ -110,7 +120,7 @@ const styles = StyleSheet.create({
     },
 
     titleBar: {
-        flex: 1,
+        flex: 0.6,
         backgroundColor: colors.primary_default,
         borderBottomWidth: 4,
         borderColor: colors.darker_secondary,
@@ -142,6 +152,18 @@ const styles = StyleSheet.create({
         flex: 1.5,
         marginVertical: 20,
         borderWidth: 2,
+    },
+
+    button: {
+        marginHorizontal: 10,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 2,
+        borderColor: colors.black,
+        padding: 8,
+        marginVertical: 5,
+        backgroundColor: colors.primary_default,
     },
 
 

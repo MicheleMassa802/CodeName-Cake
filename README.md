@@ -51,6 +51,9 @@ Order Management System mobile application hosted through a react native front e
 
 ## Logical Data Model:
 
+- The LDM for the application is the following:
+  <img src="./misc/LDM-Diagram.JPG" alt="LDM Diagram" width="1000"/>
+
 ## System Breakdown:
 
 &nbsp;

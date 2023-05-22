@@ -29,10 +29,10 @@ export default function App() {
       {/* <RegisterScreen/> */}
       {/* <LoginScreen/> */}
       {/* <HomeScreen/> */}
-      {/* <StatsScreen/> */}
+      <StatsScreen/>
       {/* <ViewOrdersScreen/> */}
       {/* <CalendarScreen/> */}
-      <AddOrderScreen/>
+      {/* <AddOrderScreen/> */}
       {/* <AddOrderFurtherDetailsScreen/> */}
       {/* <ViewReceiptScreen/> */}
 

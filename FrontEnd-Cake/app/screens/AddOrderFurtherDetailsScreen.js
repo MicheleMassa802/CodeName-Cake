@@ -73,7 +73,7 @@ function AddOrderFurtherDetailsScreen(props) {
         },
     };
     const detailTypes = Object.keys(detailObjects);
-    const chosenOrderType = orderTypes[2];
+    const chosenOrderType = orderTypes[3];
 
 
     // should know
