@@ -21,7 +21,8 @@
     "react-native": "0.71.8",
     "react-native-datepicker": "^1.7.2",
     "react-native-web": "~0.18.10",
-    "@react-native-picker/picker": "2.4.8"
+    "@react-native-picker/picker": "2.4.8",
+    "expo-device": "~5.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

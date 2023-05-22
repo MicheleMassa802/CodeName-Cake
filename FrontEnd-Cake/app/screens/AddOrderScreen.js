@@ -53,6 +53,8 @@ function AddOrderScreen(props) {
     };
 
     const onDateChange = (date) => {
+        // transform date to be 4 hours behind (EST) to account for timezone difference
+        date.setHours(date.getHours() - 4);
         handleInputChange('deliveryDate', date);
         toggleDatePicker();
     };  
@@ -60,16 +62,6 @@ function AddOrderScreen(props) {
     // Screen
     return (
         <View style={styles.container}>
-
-            {/* Date Picker Pop Up*/}
-            {showDatePicker && (<DateTimePicker
-                mode="date"
-                display="default"
-                value={order.deliveryDate}
-                onChange={(event, date) => onDateChange(date)}
-                minDate={utils.minDate}
-                maxDate={utils.maxDate}
-            />)}
 
             {/* Actual Screen to Display */}
 
@@ -79,19 +71,6 @@ function AddOrderScreen(props) {
 
             <View style={styles.detailSection}>
 
-                {/* IOS specific buttons (apple please be fucking normal next time) */}
-                {showDatePicker && Platform.OS === "ios" && (
-                    <View style={{flexDirection:"row", justifyContent: "space-around"}}>
-                        <TouchableOpacity style={{paddingHorizontal: 20, height: 50, justifyContent:"center", alignItems: "center", borderRadius:50, backgroundColor: colors.secondary}}
-                                          onPress={toggleDatePicker}>
-                            <Text style={font_styles.body}> Cancel </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={{paddingHorizontal: 20, height: 50, justifyContent:"center", alignItems: "center", borderRadius:50, backgroundColor: colors.secondary}}
-                                          onPress={toggleDatePicker}>
-                            <Text style={font_styles.body}> Cancel </Text>
-                        </TouchableOpacity>
-                    </View>
-                )}
 
                 <View style={styles.orderInput}>
                     <Text style={styles.label}>Order Name</Text>
@@ -115,6 +94,43 @@ function AddOrderScreen(props) {
                         onPressIn={toggleDatePicker}
                     />
                 </Pressable>)}
+
+                {/* Date Picker Pop Up*/}
+                {showDatePicker && (
+                <View style={{flexDirection:"row", justifyContent: "space-around", alignContent: 'center'}}>
+                    <View style={{justifyContent: "center"}}>
+                        <Text style={styles.label}>Select Delivery Date: </Text>
+                    </View>
+                    <DateTimePicker
+                        mode="date"
+                        display="default"
+                        value={order.deliveryDate}
+                        onChange={(event, date) => onDateChange(date)}
+                        minDate={utils.minDate}
+                        maxDate={utils.maxDate}
+                        style={
+                            {
+                                // center the date picker
+                                alignSelf: 'center',
+                                marginVertical: 20,
+                            }
+                        }
+                    />
+                </View>)}
+
+                {/* IOS specific buttons (apple please be fucking normal next time) */}
+                {showDatePicker && Platform.OS === "ios" && (
+                    <View style={{flexDirection:"row", justifyContent: "space-around"}}>
+                        <TouchableOpacity style={{paddingHorizontal: 20, height: 50, justifyContent:"center", alignItems: "center", borderRadius:50, backgroundColor: colors.secondary}}
+                                          onPress={toggleDatePicker}>
+                            <Text style={font_styles.body}> Cancel </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={{paddingHorizontal: 20, height: 50, justifyContent:"center", alignItems: "center", borderRadius:50, backgroundColor: colors.secondary}}
+                                          onPress={toggleDatePicker}>
+                            <Text style={font_styles.body}> Ok </Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
 
                 <View style={styles.orderInput}>
                     <Text style={styles.label}>Client Contact</Text>

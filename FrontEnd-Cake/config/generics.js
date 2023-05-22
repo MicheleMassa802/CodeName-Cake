@@ -60,6 +60,12 @@ const font_styles = StyleSheet.create({
         // fontFamily: "Inconsolata",
         backgroundColor: colors.secondary,
     },
+
+    smallBody: {
+        fontSize: 14,
+        fontWeight: "normal",
+        // fontFamily: "Inconsolata",
+    },
     
 });
 
