@@ -1,4 +1,4 @@
-package com.cake.Backend;
+package com.CodeNameCake.Backend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

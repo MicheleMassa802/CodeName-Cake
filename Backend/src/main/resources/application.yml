@@ -1,0 +1,27 @@
+server:
+  #  to change the port the application is listening for requests on
+  port: 8080  # ==> find application at localhost:8000
+  error:
+    include-message: always
+
+#spring:
+#  main:
+#    # default value is 'servlet' if we set to none, then we have no web server
+#    web-application-type: none
+
+spring:
+  datasource:
+    # our connection to the table customer on the sending port
+    url: jdbc:postgresql://localhost:5332/codenamecake
+    username: postgres
+    password: Pulpa_rico777
+  jpa:
+    hibernate:
+      # makes it so upon each rerun the db is rebuilt (no data saved)
+      ddl-auto: create-drop
+    # ddl-auto: update  -> makes it so that DB is not wiped on re-run
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
