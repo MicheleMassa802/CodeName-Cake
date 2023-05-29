@@ -17,13 +17,13 @@ public class User {
             generator = "user_sequence"
     )
     private Long userId;
+    @Basic(optional = false)
+    private Long shopId;
     private String username;
     private String email;
     private String password;
-    private Long shopId;
 
-    public User() {
-    }
+    public User() {}
 
     public User(Long userId, String username, String email, String password, Long shopId) {
         this.userId = userId;
