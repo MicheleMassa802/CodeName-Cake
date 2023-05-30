@@ -2,8 +2,22 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import colors from '../../config/colors';
 import font_styles from '../../config/generics';
+import { useFocusEffect } from '@react-navigation/native';
 
 function WelcomeScreen(props) {
+
+    useFocusEffect(
+        React.useCallback(() => {
+            resetGlobalState();
+        }, [])
+    );
+
+    const resetGlobalState = () => {
+        console.log("Resetting global state");
+        // once user gets to welcome screen, reset global state
+        global.user = null;
+        global.token = null;
+    }
 
     return (
         <View style={styles.container}>
@@ -15,18 +29,14 @@ function WelcomeScreen(props) {
             </View>
 
 
-            <View style = {styles.middle}>
-                <TouchableOpacity onPress={() => console.log("Register")}>  
-                    <Text style={font_styles.subtitle}> Register </Text>
-                </TouchableOpacity>
-            </View>
+            <TouchableOpacity style = {styles.middle} onPress={() => props.navigation.push("RegisterScreen")}>  
+                <Text style={font_styles.subtitle}> Register </Text>
+            </TouchableOpacity>
 
 
-            <View style = {styles.bottom}>
-                <TouchableOpacity onPress={() => console.log("Login")}>  
-                    <Text style={font_styles.subtitle}> Or Login! </Text>
-                </TouchableOpacity>
-            </View>
+            <TouchableOpacity style = {styles.bottom} onPress={() => props.navigation.push("LoginScreen")}>  
+                <Text style={font_styles.subtitle}> Or Login! </Text>
+            </TouchableOpacity>
         </View>
     );
 }

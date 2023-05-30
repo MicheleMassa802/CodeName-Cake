@@ -13,11 +13,10 @@ function StatsScreen(props) {
     
     const content = {
         ordersCompleted: 10,
-        orderLevel: 117,
         mostPopularOrderType: "Cake",
         biggestOrder: "$360",
         totalRegisteredOrderIncome: "$2100",
-        incomeLevel: 102,
+        businessLevel: 102,
         possibleRepeats: [
             {
                 name: "John Doe",
@@ -65,11 +64,10 @@ function StatsScreen(props) {
             <View style = {styles.content}>
                 <ScrollView>
                     <Text style={styles.innerContent}> -Orders Completed: {content.ordersCompleted} </Text>
-                    <Text style={styles.innerContent}> -Order Level: {content.orderLevel} </Text>
+                    <Text style={styles.innerContent}> -Business Level: {content.businessLevel} </Text>
                     <Text style={styles.innerContent}> -Most Popular Order Type: {content.mostPopularOrderType} </Text>
                     <Text style={styles.innerContent}> -Biggest Order: {content.biggestOrder} </Text>
                     <Text style={styles.innerContent}> -Total Registered Order Income: {content.totalRegisteredOrderIncome} </Text>
-                    <Text style={styles.innerContent}> -Income Level: {content.incomeLevel} </Text>
                     <Text style={styles.innerContent}> -Possible Repeats: </Text>
 
                     {content.possibleRepeats.map((item, index) => (

@@ -1,5 +1,9 @@
 import { StatusBar as ExpoStatusBar} from 'expo-status-bar';
 import { SafeAreaView, StyleSheet, Platform, StatusBar } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+// screen imports
 import WelcomeScreen from './app/screens/WelcomeScreen';
 import LoginScreen from './app/screens/LoginScreen';
 import RegisterScreen from './app/screens/RegisterScreen';
@@ -23,19 +27,27 @@ export default function App() {
     }
   });
 
+  const Stack = createNativeStackNavigator();
+
   return (
     <SafeAreaView style={styles.safeContainer}>
-      {/* <WelcomeScreen /> */}
-      {/* <RegisterScreen/> */}
-      {/* <LoginScreen/> */}
-      {/* <HomeScreen/> */}
-      <StatsScreen/>
-      {/* <ViewOrdersScreen/> */}
-      {/* <CalendarScreen/> */}
-      {/* <AddOrderScreen/> */}
-      {/* <AddOrderFurtherDetailsScreen/> */}
-      {/* <ViewReceiptScreen/> */}
+      <NavigationContainer>
+        <Stack.Navigator>
 
+          <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} options={{headerShown: false, headerLeft: null}}/>
+          <Stack.Screen name="RegisterScreen" component={RegisterScreen} options={{headerShown: false}}/>
+          <Stack.Screen name="LoginScreen" component={LoginScreen} options={{headerShown: false}}/>
+          <Stack.Screen name="HomeScreen" component={HomeScreen} options={{headerShown: false, headerLeft: null}}/>
+          <Stack.Screen name="StatsScreen" component={StatsScreen} options={{headerShown: false}}/>
+          <Stack.Screen name="ViewOrdersScreen" component={ViewOrdersScreen} options={{headerShown: false}}/>
+          <Stack.Screen name="CalendarScreen" component={CalendarScreen} options={{headerShown: false}}/>
+          <Stack.Screen name="AddOrderScreen" component={AddOrderScreen} options={{headerShown: false}}/>
+          <Stack.Screen name="AddOrderFurtherDetailsScreen" component={AddOrderFurtherDetailsScreen} options={{headerShown: false}}/>
+          <Stack.Screen name="ViewReceiptScreen" component={ViewReceiptScreen} options={{headerShown: false}}/>
+
+        </Stack.Navigator>
+
+      </NavigationContainer>
     </SafeAreaView>
 
     // <RegisterScreen/>

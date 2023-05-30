@@ -7,7 +7,7 @@ import font_styles from '../../config/generics';
 function AddOrderFurtherDetailsScreen(props) {
 
     // constant controlling whether this page is being displayed for creation of a new order or editing of an existing one
-    const editing = false;
+    const editing = props.route.params.editing;
     const existingOrderDetails = {
         "Cake Tier #0" : {
             tierSize: "6 inch",
@@ -111,6 +111,11 @@ function AddOrderFurtherDetailsScreen(props) {
 
     const finishOrder = () => {
         console.log("Finishing Order");
+        // fetch request to backend to add order to database
+
+        // pop the two previous screens off the stack
+        props.navigation.popToTop();
+        props.navigation.push("HomeScreen")
     };
 
     // Screen

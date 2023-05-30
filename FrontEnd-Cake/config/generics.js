@@ -3,7 +3,7 @@ import colors from './colors';
 
 const font_styles = StyleSheet.create({
     title: {
-        fontSize: 30,
+        fontSize: 24,
         fontWeight: "bold",
         // fontFamily: "Inconsolata",
         textAlign: "center",
@@ -15,6 +15,12 @@ const font_styles = StyleSheet.create({
         fontWeight: "bold",
         // fontFamily: "Inconsolata",
         textAlign: "center",
+    },
+
+    homeButton: {
+        fontSize: 18,
+        fontWeight: "normal",
+        // fontFamily: "Inconsolata",
     },
 
     body: {

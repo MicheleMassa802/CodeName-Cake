@@ -24,6 +24,13 @@ function LoginScreen(props) {
         },
     });
 
+    const login = () => {
+        console.log(`Logging in with info: ${username}, ${email}, ${password}`);
+        // fetch call to register
+        props.navigation.popToTop();
+        props.navigation.push("HomeScreen", {username: username, email: email});
+    }
+
     return (
         <View style={styles.container}>
             
@@ -84,11 +91,10 @@ function LoginScreen(props) {
                 />
             </View>
 
-            <View style = {functionStyles.button}>
-                <TouchableOpacity onPress={() => console.log("Logged In")}>  
-                    <Text style={font_styles.subtitle}> Finish Login </Text>
-                </TouchableOpacity>
-            </View>
+            <TouchableOpacity style = {functionStyles.button} onPress={login}>  
+                <Text style={font_styles.subtitle}> Finish Login </Text>
+            </TouchableOpacity>
+
         
         </View>
     );

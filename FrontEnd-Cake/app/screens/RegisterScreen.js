@@ -22,6 +22,13 @@ function RegisterScreen(props) {
         },
     });
 
+    const register = () => {
+        console.log(`Registering with info: ${username}, ${email}, ${shopName}, ${colorway}, ${password}`);
+        // fetch call to register
+        props.navigation.popToTop();
+        props.navigation.push("HomeScreen", {username: username, email: email, shopName: shopName, colorway: colorway, password: password});
+    }
+
     // console.log("RegisterScreen: username = " + username);
     // console.log("RegisterScreen: email = " + email);
     // console.log("RegisterScreen: shopName = " + shopName);
@@ -86,11 +93,9 @@ function RegisterScreen(props) {
                 ))}
             </View>
 
-            <View style = {functionStyles.button}>
-                <TouchableOpacity onPress={() => console.log("Registered")}>  
-                    <Text style={font_styles.subtitle}> Finish Registration </Text>
-                </TouchableOpacity>
-            </View>
+            <TouchableOpacity style = {functionStyles.button} onPress={register}>  
+                <Text style={font_styles.subtitle}> Finish Registration </Text>
+            </TouchableOpacity>
         
         </View>
     );

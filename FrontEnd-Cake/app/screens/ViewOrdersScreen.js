@@ -7,22 +7,27 @@ function ViewOrdersScreen(props) {
     
     const liveOrders = [
         {
+            id: 1,
             name: "John Doe",
             daysLeft: 3,
         }, 
-        {
+        {   
+            id: 2,
             name: "Jane Doe",
             daysLeft: 5,
         },
         {
+            id: 3,
             name: "Mario Gallo",
             daysLeft: 8,
         }, 
         {
+            id: 4,
             name: "Bejamin Tennyson",
             daysLeft: 10,
         },
         {
+            id: 5,
             name: "Gulliver HonestMan",
             daysLeft: 12,
         },
@@ -30,10 +35,12 @@ function ViewOrdersScreen(props) {
 
     const pastOrders = [
         {
+            id: 6,
             name: "John Doe",
             dateDelivered: "12/12/2020",
         },
         {
+            id: 7,
             name: "Jane Doe",
             dateDelivered: "12/12/2020",
         }
@@ -50,6 +57,17 @@ function ViewOrdersScreen(props) {
             // add the index to the array
             setSelectedOrders([...selectedOrders, index]);
         }
+    }
+
+    const goToOrder = (orderId) => {
+        // go to the order screen with the selected orders
+        console.log("Going to order: ", orderId);
+        props.navigation.push("ViewReceiptScreen", {orderId: orderId});
+    }
+
+    const mergeOrders = () => {
+        console.log("Merging the orders");
+        // fetch request to merge the orders
     }
 
 
@@ -82,7 +100,7 @@ function ViewOrdersScreen(props) {
                             <Text style={styles.headingContent}> Days Left </Text>
                         </View>
                         {selectedOrders.length > 1 &&
-                            <TouchableOpacity style = {styles.button} onPress={() => console.log("Merging the orders")}>
+                            <TouchableOpacity style = {styles.button} onPress={mergeOrders}>
                                 <Text style={font_styles.smallBody}> Merge </Text>
                             </TouchableOpacity>
                         }
@@ -92,8 +110,8 @@ function ViewOrdersScreen(props) {
                         <ScrollView>
 
                             {liveOrders.map((item, index) => (
-                                <View key={index} style={styles.lineSelect}>
-                                    <TouchableOpacity style = {[styles.contentLine, {width: '80%'}]} onPress={() => console.log("Onto this Current order")}>
+                                <View key={item.id} style={styles.lineSelect}>
+                                    <TouchableOpacity style = {[styles.contentLine, {width: '80%'}]} onPress={() => goToOrder(item.id)}>
                                         <Text style={styles.innerContent}> {item.name}</Text>
                                         <Text style={styles.innerContent}> {item.daysLeft} </Text>
                                     </TouchableOpacity>
@@ -119,7 +137,7 @@ function ViewOrdersScreen(props) {
                                 <Text style={styles.headingContent}> Date Delivered </Text>
                             </View>
                         {pastOrders.map((item, index) => (
-                            <TouchableOpacity key={index + "past"} style = {styles.contentLine} onPress={() => console.log("Onto this Past order")}>
+                            <TouchableOpacity key={item.id} style = {styles.contentLine} onPress={() => goToOrder(item.id)}>
                                 <Text style={styles.innerContent}> {item.name}</Text>
                                 <Text style={styles.innerContent}> {item.dateDelivered} </Text>
                             </TouchableOpacity>

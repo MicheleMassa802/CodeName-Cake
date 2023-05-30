@@ -17,7 +17,6 @@ public class UserController {
         this.userService = userService;
     }
 
-    // Get Method mapping to the index page of the url (http://localhost:8080/)
     @GetMapping
     public List<User> getUsers(){
         return userService.getUsers();

@@ -138,7 +138,7 @@ function CalendarScreen(props) {
                     <Text style={styles.dateContentTitle}> {"Orders for " + utils.monthMap[month] + " " + day + ", " + year} </Text>
                     {mayOrders[day].length == 0 ?
                         <Text style={styles.dateContentText}> {"No orders for this day"} </Text> :
-                        mayOrders[day].map((order) => (<Text style={styles.dateContentText}> {"-> " + order.name} </Text>))}
+                        mayOrders[day].map((order) => (<Text key={day + "info" + order.id } style={styles.dateContentText}> {"-> " + order.name} </Text>))}
                 </ScrollView>
             </View>
         </View>

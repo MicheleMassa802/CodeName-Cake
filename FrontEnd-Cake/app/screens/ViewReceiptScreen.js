@@ -1,21 +1,36 @@
-import {React, useState } from 'react';
-import { View, TextInput, StyleSheet, Text, TouchableOpacity, Pressable, Platform, ScrollView } from 'react-native';
+import {React } from 'react';
+import { View, TextInput, StyleSheet, Text, TouchableOpacity, Pressable, Platform, ScrollView, Linking } from 'react-native';
 import colors from '../../config/colors';
 import font_styles from '../../config/generics';
 import utils from '../../config/calendarUtil';
 
 
+
 function ViewReceiptScreen(props) {
+    const orderIdParam = props.route.params.orderId;
+
+    const baseUrl = "http://192.168.0.113:8080/";
+    const endpoint = "api/dev/orders/getReceiptPdf/1";
+    const receiptUrl = baseUrl + endpoint;
+
+    const today = new Date();
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
 
     const basicOrderDetails = {
         orderId: "<Order ID>",
         orderName: "<Order Name>",
-        deliveryDate: new Date(),
+        deliveryDate: tomorrow,
         clientContact: "<Client Contact>",
         extraNotes: "<Extra Notes>",
         estimatedCost: "<Estimated Cost>",
         orderType: "Cake",
     }
+
+    // if today is greater than the delivery date, then the order is in the past
+    const futureOrder = today < basicOrderDetails.deliveryDate;
 
     const furtherOrderDetails = {
         "Cake Tier #0" : {
@@ -43,6 +58,7 @@ function ViewReceiptScreen(props) {
             decorationDescription: "Pink and White",
         },
     };
+    
 
     const getStringDate = (date) => {
         const day = date.getDate();
@@ -50,6 +66,24 @@ function ViewReceiptScreen(props) {
         const year = date.getFullYear();
 
         return day + "-" + month + "-" + year;
+    }
+
+    const openPDF = () => {
+        Linking.openURL(receiptUrl)
+        .catch((err) => console.error('An error occurred', err));
+    }
+
+    const goToAttachedOrder = () => {
+        console.log("Going to attached order");
+        // take the attachedOrder attribute from the corresponding column
+        const attachedOrderId = 1;
+        props.navigation.push("ViewReceiptScreen", {orderId: attachedOrderId});
+    }
+
+    const editOrder = () => {
+        console.log("Editing order");
+        // go to order editing screen
+        props.navigation.push("AddOrderScreen", {editing: true, orderId: orderIdParam});
     }
 
     const chainedOrder = true; // true if the attachedOrder field in the order object is not null
@@ -61,10 +95,11 @@ function ViewReceiptScreen(props) {
         <View style={styles.container}>
 
             <View style = {styles.titleBar}>
-                <Text style={font_styles.title}> Viewing Order {basicOrderDetails.orderId} </Text>
+                <Text style={font_styles.title}> Viewing Order {orderIdParam} </Text>
             </View>
 
             <View style={styles.detailSection}>
+
                 <View style={styles.sectionDivider}>
                     <Text style={font_styles.subtitle}> Basic Details: </Text>
                 </View>
@@ -78,7 +113,6 @@ function ViewReceiptScreen(props) {
                     <Text style={font_styles.body}> Order Type: {basicOrderDetails.orderType} </Text>
                 </View>
                 
-
                 <View style={styles.sectionDivider}>
                     <Text style={font_styles.subtitle}> Further Details: </Text>
                 </View>
@@ -97,9 +131,18 @@ function ViewReceiptScreen(props) {
                         ))}
                     </ScrollView>
                 </View>
+                
+                <View style={styles.buttonPair}>
+                    <TouchableOpacity style={styles.subButton} onPress={openPDF}>
+                        <Text style={font_styles.body}> Print Order (PDF) </Text>
+                    </TouchableOpacity>
+                    {futureOrder && <TouchableOpacity style={styles.subButton} onPress={editOrder}>
+                        <Text style={font_styles.body}> Edit Order </Text>
+                    </TouchableOpacity>}
+                </View>
 
                 {chainedOrder && (
-                    <TouchableOpacity style={styles.button} onPress={() => console.log("Onto the attached order")}>
+                    <TouchableOpacity style={styles.button} onPress={goToAttachedOrder}>
                         <Text style={font_styles.subtitle}> View Attached Order </Text>
                     </TouchableOpacity>
                 )}
@@ -128,6 +171,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
 
+
     detailSection: {
         flex: 6,
         margin: 15,
@@ -143,26 +187,45 @@ const styles = StyleSheet.create({
     },
 
     topSectionContent: {
-        flex: 0.8,
+        flex: 0.9,
         marginVertical: 20,
         borderWidth: 2,
     },
 
     bottomSectionContent: {
-        flex: 1.5,
+        flex: 1.3,
         marginVertical: 20,
         borderWidth: 2,
     },
 
-    button: {
+    buttonPair: {
+        flex: 0.25,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginBottom: 10,
+    },
+
+    subButton : {
+        flex: 1,
         marginHorizontal: 10,
-        borderRadius: 20,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 2,
+        borderColor: colors.black,
+        backgroundColor: colors.primary_default,
+    },
+
+    button: {
+        flex: 0.2,
+        marginHorizontal: 10,
+        borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 2,
         borderColor: colors.black,
         padding: 8,
-        marginVertical: 5,
+        marginVertical: 3,
         backgroundColor: colors.primary_default,
     },
 

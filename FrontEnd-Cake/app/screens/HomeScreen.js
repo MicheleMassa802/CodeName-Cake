@@ -5,6 +5,18 @@ import font_styles from '../../config/generics';
 
 function HomeScreen(props) {
     
+    const goToPage = (page) => {
+        console.log("Going to " + page);
+        // fetch request for info and pass it along in the params
+        props.navigation.push(page);
+    }
+
+    const addNewOrder = () => {
+        console.log("Adding new order");
+        // fetch request for info and pass it along in the params
+        props.navigation.push("AddOrderScreen", {editing: false});
+    }
+
     return (
         <View style={styles.container}>
             <View style = {styles.roof}>
@@ -13,52 +25,44 @@ function HomeScreen(props) {
 
             <View style={styles.middle}>
                 <View style={styles.innerMiddle}>
-                    <View style={styles.innerMiddleButton}>
-                        <TouchableOpacity style={styles.innerButton} onPress={() => console.log("Viewing Orders")}>
-                            <Text numberOfLines={2} style={font_styles.windowLabel}> View {'\n'} Orders </Text>
-                        </TouchableOpacity>
-                    </View>
+                    <TouchableOpacity style={styles.innerMiddleButton} onPress={() => goToPage("ViewOrdersScreen")}>
+                        <Text numberOfLines={2} style={font_styles.windowLabel}> View {'\n'} Orders </Text>
+                    </TouchableOpacity>
 
                     <Image style={styles.windowImage} source={require('../assets/log.png')}/> 
                 </View>
 
                 <View style={styles.innerMiddle}>
-                    <View style={styles.innerMiddleButton}>
-                        <TouchableOpacity style={styles.innerButton} onPress={() => console.log("Viewing Calendar")}>
-                            <Text numberOfLines={2} style={font_styles.windowLabel}> View {'\n'} Calendar </Text>
-                        </TouchableOpacity>
-                    </View>
+                    <TouchableOpacity style={styles.innerMiddleButton} onPress={() => goToPage("CalendarScreen")}>
+                        <Text numberOfLines={2} style={font_styles.windowLabel}> View {'\n'} Calendar </Text>
+                    </TouchableOpacity>
 
                     <Image style={styles.windowImage} source={require('../assets/log.png')}/> 
                 </View>
 
-                <View style={styles.innerMiddle}>
-                <View style={styles.innerMiddleButton}>
-                        <TouchableOpacity style={styles.innerButton} onPress={() => console.log("Viewing Shop")}>
-                            <Text numberOfLines={2} style={font_styles.windowLabel}> View {'\n'} Shop </Text>
-                        </TouchableOpacity>
-                    </View>
+                {/* <View style={styles.innerMiddle}>
+                    <TouchableOpacity style={styles.innerMiddleButton} onPress={() => goToPage("CalendarScreen")}>
+                        <Text numberOfLines={2} style={font_styles.windowLabel}> View {'\n'} Shop </Text>
+                    </TouchableOpacity>
 
                     <Image style={styles.windowImage} source={require('../assets/log.png')}/>  
-                </View>
+                </View> */}
 
                 <View style={styles.innerMiddle}>
-                    <View style={styles.innerMiddleButton}>
-                        <TouchableOpacity style={styles.innerButton} onPress={() => console.log("Viewing Stats")}>
-                            <Text numberOfLines={2} style={font_styles.windowLabel}> View {'\n'} Stats </Text>
-                        </TouchableOpacity>
-                    </View>
+                    <TouchableOpacity style={styles.innerMiddleButton} onPress={() => goToPage("StatsScreen")}>
+                        <Text numberOfLines={2} style={font_styles.windowLabel}> View {'\n'} Stats </Text>
+                    </TouchableOpacity>
 
                     <Image style={styles.windowImage} source={require('../assets/log.png')}/>  
                 </View>
                 
             </View>
 
-            <View style = {styles.street}>
-                <TouchableOpacity onPress={() => console.log("Adding New Order")}>  
-                    <Text style={font_styles.subtitle}> Add New Order</Text>
-                </TouchableOpacity>
-            </View>
+
+            <TouchableOpacity style = {styles.street} onPress={addNewOrder}>  
+                <Text style={font_styles.subtitle}> Add New Order</Text>
+            </TouchableOpacity>
+
         </View>
     );
 }

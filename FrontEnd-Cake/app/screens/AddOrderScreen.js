@@ -9,10 +9,13 @@ import utils from '../../config/calendarUtil';
 function AddOrderScreen(props) {
 
     // constant controlling whether this page is being displayed for creation of a new order or editing of an existing one
-    const editing = true;
+    const editing = props.route.params.editing;
+    
+    const todayString = new Date().toISOString().split('T')[0];
+    
     const existingOrder = {
         orderName: "<Order Name>",
-        deliveryDate: new Date(),
+        deliveryDate: todayString,
         clientContact: "<Client Contact>",
         extraNotes: "<Extra Notes>",
         estimatedCost: "<Estimated Cost>",
@@ -23,7 +26,7 @@ function AddOrderScreen(props) {
     // States
     const [order, setOrder] = useState({
         orderName: editing ? existingOrder.orderName : "",
-        deliveryDate: editing ? existingOrder.deliveryDate : new Date(),
+        deliveryDate: editing ? existingOrder.deliveryDate : todayString,
         clientContact: editing ? existingOrder.clientContact : "",
         extraNotes: editing ? existingOrder.extraNotes : "",
         estimatedCost: editing ? existingOrder.estimatedCost : "",
@@ -46,6 +49,8 @@ function AddOrderScreen(props) {
     
     const continueToOrderDetails = () => {
         console.log("Continueing to Order Details");
+        // still not a fetch but pass on all the args so far
+        props.navigation.push("AddOrderFurtherDetailsScreen", {editing: editing, order: order});
     };
 
     const toggleDatePicker = () => { 
@@ -55,6 +60,8 @@ function AddOrderScreen(props) {
     const onDateChange = (date) => {
         // transform date to be 4 hours behind (EST) to account for timezone difference
         date.setHours(date.getHours() - 4);
+        // transform the date into a string
+        date = date.toISOString().split('T')[0];
         handleInputChange('deliveryDate', date);
         toggleDatePicker();
     };  
@@ -88,7 +95,7 @@ function AddOrderScreen(props) {
                     <TextInput
                         style={styles.input}
                         placeholder="Select Delivery Date"
-                        value={order.deliveryDate.toDateString()}
+                        value={order.deliveryDate}
                         onChangeText={(value) => handleInputChange('deliveryDate', value)}
                         editable={false}
                         onPressIn={toggleDatePicker}
