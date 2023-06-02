@@ -33,13 +33,17 @@ public class UserService {
         // NOTE: shop creation request must be sent first to create the shop and then make sure
         // we catch the shopId so that it's automatically sent with this request
 
-        Optional<User> userOptional = userRepository.findUserByEmail(user.getEmail());
+        Optional<User> userUsernameOptional = userRepository.findUserByUsername((user.getUsername()));
+        Optional<User> userEmailOptional = userRepository.findUserByEmail(user.getEmail());
 
-        if (userOptional.isPresent()) {
+        if (userUsernameOptional.isPresent()) {
+            // throw exception
+            throw new IllegalStateException("Username Taken");
+        } else if (userEmailOptional.isPresent()) {
             // throw exception
             throw new IllegalStateException("Email Taken");
         } else {
-            // save student
+            // save user
             userRepository.save(user);
         }
     }
@@ -84,6 +88,18 @@ public class UserService {
                     // let email update go through
                     actualUser.setEmail(userUpdated.getEmail());
                 }
+            } else if (!actualUser.getUsername().equals(userUpdated.getUsername())) {
+                // check the updated username and let the update go through if valid
+                Optional<User> userByUsername = userRepository.findUserByUsername(userUpdated.getUsername());
+
+                if (userByUsername.isPresent()) {
+                    // throw exception (stop update from going through)
+                    throw new IllegalStateException("Username Taken");
+                } else {
+                    // let username update go through
+                    actualUser.setUsername(userUpdated.getUsername());
+                }
+
             }
 
             // finish off with the saving of the user

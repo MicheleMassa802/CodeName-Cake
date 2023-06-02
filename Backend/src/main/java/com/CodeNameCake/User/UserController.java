@@ -23,21 +23,23 @@ public class UserController {
     }
 
 
-    @PostMapping
-    public void addUser(@RequestBody User user){
-        userService.addUser(user);
-
-    }
-
     @DeleteMapping(path = "/{userId}")
     public void deleteUser(@PathVariable("userId") Long userId){
         userService.deleteUser(userId);
     }
 
-    @PutMapping(path = "/{userId}")
-    public void updateUser(@PathVariable("userId") Long userId, @RequestBody User userUpdated) {
-        userService.updateUser(userId, userUpdated);
-    }
+//    Absorbed by Auth class
+
+//    @PostMapping
+//    public void addUser(@RequestBody User user){
+//        userService.addUser(user);
+//
+//    }
+
+//    @PutMapping(path = "/{userId}")
+//    public void updateUser(@PathVariable("userId") Long userId, @RequestBody User userUpdated) {
+//        userService.updateUser(userId, userUpdated);
+//    }
 
 
 }
