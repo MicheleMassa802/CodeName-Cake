@@ -25,7 +25,7 @@ public class ShopStats {
     private String popularOrderType;  // one of "Cake", "Cookies", "Cupcakes", "Other"
     private Integer biggestOrder;
     private Integer totalOrderIncome;
-    private Integer businessLevel;  // from 0 to 4
+    private Integer businessLevel;  // number where 100 is average
 
 
     public ShopStats(){}

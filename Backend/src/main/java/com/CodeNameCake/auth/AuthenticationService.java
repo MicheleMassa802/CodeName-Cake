@@ -48,7 +48,7 @@ public class AuthenticationService {
         }
 
         var jwtToken = jwtService.generateToken(newUser);
-        return AuthenticationResponse.builder().token(jwtToken).build();
+        return AuthenticationResponse.builder().token(jwtToken).userId(newUser.getUserId()).build();
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -83,7 +83,7 @@ public class AuthenticationService {
         // neither of these exceptions should occur after verification, but it's just a formality
 
         var jwtToken = jwtService.generateToken(user);
-        return AuthenticationResponse.builder().token(jwtToken).build();
+        return AuthenticationResponse.builder().token(jwtToken).userId(user.getUserId()).build();
 
     }
 
