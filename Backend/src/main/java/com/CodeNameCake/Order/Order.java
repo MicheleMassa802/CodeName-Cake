@@ -32,13 +32,15 @@ public class Order {
     private Integer estimatedCost;
     private String orderType;  // one of "Cake", "Cookies", "Cupcakes", "Other"
     @Basic(optional = true)
-    private Long attachedOrder;  // key into another Orders table row
+    private Long attachedFrontOrder;  // key into another Orders table row
+    @Basic(optional = true)
+    private Long attachedNextOrder;  // key into another Orders table row
 
     public Order(){}
 
     public Order(Long orderId, Long shopId, String orderName, Date dateReceived, Date deliveryDate,
                  String clientContact, String extraNotes, Integer estimatedCost, String orderType,
-                 Long attachedOrder) {
+                 Long attachedFrontOrder, Long attachedNextOrder) {
         this.orderId = orderId;
         this.shopId = shopId;
         this.orderName = orderName;
@@ -48,11 +50,13 @@ public class Order {
         this.extraNotes = extraNotes;
         this.estimatedCost = estimatedCost;
         this.orderType = orderType;
-        this.attachedOrder = attachedOrder;
+        this.attachedFrontOrder = attachedFrontOrder;
+        this.attachedNextOrder = attachedNextOrder;
     }
 
     public Order(Long shopId, String orderName, Date dateReceived, Date deliveryDate, String clientContact,
-                 String extraNotes, Integer estimatedCost, String orderType, Long attachedOrder) {
+                 String extraNotes, Integer estimatedCost, String orderType, Long attachedFrontOrder,
+                 Long attachedNextOrder) {
         this.shopId = shopId;
         this.orderName = orderName;
         this.dateReceived = dateReceived;
@@ -61,7 +65,8 @@ public class Order {
         this.extraNotes = extraNotes;
         this.estimatedCost = estimatedCost;
         this.orderType = orderType;
-        this.attachedOrder = attachedOrder;
+        this.attachedFrontOrder = attachedFrontOrder;
+        this.attachedNextOrder = attachedNextOrder;
     }
 
     public Long getOrderId() {
@@ -136,12 +141,20 @@ public class Order {
         this.orderType = orderType;
     }
 
-    public Long getAttachedOrder() {
-        return attachedOrder;
+    public Long getAttachedFrontOrder() {
+        return attachedFrontOrder;
     }
 
-    public void setAttachedOrder(Long attachedOrder) {
-        this.attachedOrder = attachedOrder;
+    public void setAttachedFrontOrder(Long attachedFrontOrder) {
+        this.attachedFrontOrder = attachedFrontOrder;
+    }
+
+    public Long getAttachedNextOrder() {
+        return attachedNextOrder;
+    }
+
+    public void setAttachedNextOrder(Long attachedNextOrder) {
+        this.attachedNextOrder = attachedNextOrder;
     }
 
     @Override
@@ -156,7 +169,8 @@ public class Order {
                 ", extraNotes='" + extraNotes + '\'' +
                 ", estimatedCost=" + estimatedCost +
                 ", orderType='" + orderType + '\'' +
-                ", attachedOrder=" + attachedOrder +
+                ", attachedPrevOrder=" + attachedFrontOrder +
+                ", attachedNextOrder=" + attachedNextOrder +
                 '}';
     }
 }

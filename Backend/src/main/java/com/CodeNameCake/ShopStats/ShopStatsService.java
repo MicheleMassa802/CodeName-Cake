@@ -54,7 +54,6 @@ public class ShopStatsService {
     // POST METHOD //
     /////////////////
     public void addShopStats(ShopStats shopStatRow) {
-        // returns its ID that is to be sent with the user creation request
         shopStatsRepository.save(shopStatRow);  // no repeats to take care of
 
     }

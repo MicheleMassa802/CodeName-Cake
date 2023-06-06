@@ -18,21 +18,21 @@ public class OrderDetailField {
     )
     private Long orderDetailFieldId;
     @Basic(optional = false)
-    private Long orderDetailId;  // foreign key to OrderDetails table
+    private Long orderId;  // foreign key to Order table
     private String fieldName;
     private String fieldValue;
 
     public OrderDetailField(){}
 
-    public OrderDetailField(Long orderDetailFieldId, Long orderDetailId, String fieldName, String fieldValue) {
+    public OrderDetailField(Long orderDetailFieldId, Long orderId, String fieldName, String fieldValue) {
         this.orderDetailFieldId = orderDetailFieldId;
-        this.orderDetailId = orderDetailId;
+        this.orderId = orderId;
         this.fieldName = fieldName;
         this.fieldValue = fieldValue;
     }
 
-    public OrderDetailField(Long orderDetailId, String fieldName, String fieldValue) {
-        this.orderDetailId = orderDetailId;
+    public OrderDetailField(Long orderId, String fieldName, String fieldValue) {
+        this.orderId = orderId;
         this.fieldName = fieldName;
         this.fieldValue = fieldValue;
     }
@@ -45,12 +45,12 @@ public class OrderDetailField {
         this.orderDetailFieldId = orderDetailFieldId;
     }
 
-    public Long getOrderDetailId() {
-        return orderDetailId;
+    public Long getOrderId() {
+        return orderId;
     }
 
-    public void setOrderDetailId(Long orderDetailId) {
-        this.orderDetailId = orderDetailId;
+    public void setOrderId(Long orderId) {
+        this.orderId = orderId;
     }
 
     public String getFieldName() {
@@ -73,7 +73,7 @@ public class OrderDetailField {
     public String toString() {
         return "OrderDetailField{" +
                 "orderDetailFieldId=" + orderDetailFieldId +
-                ", orderDetailId=" + orderDetailId +
+                ", orderDetailId=" + orderId +
                 ", fieldName='" + fieldName + '\'' +
                 ", fieldValue='" + fieldValue + '\'' +
                 '}';

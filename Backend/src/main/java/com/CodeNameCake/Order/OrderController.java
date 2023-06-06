@@ -2,14 +2,12 @@ package com.CodeNameCake.Order;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "api/dev/orders")
@@ -18,7 +16,6 @@ public class OrderController {
     private final OrderService orderService;
 
     @Autowired
-
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
     }
@@ -40,5 +37,42 @@ public class OrderController {
 
         orderService.exportPDF(response, orderId);
     }
+
+    @GetMapping(path = "/getShopOrders/{shopId}")
+    public List<List<OrderResponse>> getShopOrders(@PathVariable("shopId") Long shopId) {
+        return orderService.getShopOrders(shopId, null);
+    }
+
+    @GetMapping(path = "/getShopTermOrders/{shopId/{term}")
+    public List<List<OrderResponse>> getShopTermOrders(@PathVariable("shopId") Long shopId,
+                                         @PathVariable("term") String term) {
+        return orderService.getShopOrders(shopId, term);
+    }
+
+    @PostMapping
+    public void addOrder(@RequestBody OrderRequest order) {
+        orderService.addOrder(order);
+    }
+
+    @PostMapping(path = "/merge/{orderId1}/{orderId2}")
+    public void mergeOrders(@PathVariable("orderId1") Long orderId1,
+                            @PathVariable("orderId2") Long orderId2) {
+        orderService.mergeOrders(orderId1, orderId2);
+    }
+
+    @DeleteMapping(path="/delete/{orderId}")
+    public void deleteOrder(@PathVariable("orderId") Long orderId) {
+        orderService.deleteOrder(orderId);
+    }
+
+    @PutMapping(path="/update")
+    public void updateOrder(@RequestBody List<OrderResponse> orderUpdater) {
+        // order input given as a list of orderResponses as you first get the non-updated into the FE and once the user
+        // modifies that response list, it gets sent back
+
+        // orderUpdater already comes with its corresponding orderIds to get the original objects
+        orderService.updateOrder(orderUpdater);
+    }
+
 
 }
