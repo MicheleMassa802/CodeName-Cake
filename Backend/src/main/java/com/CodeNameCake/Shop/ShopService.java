@@ -35,6 +35,10 @@ public class ShopService {
         }
     }
 
+    public boolean shopExists(Long shopId) {
+        return shopRepository.existsById(shopId);
+    }
+
 
     /////////////////
     // POST METHOD //

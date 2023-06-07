@@ -20,21 +20,21 @@ public class ShopStats {
     @Basic(optional = false)
     private Long shopId;  // foreign key to Shops table
     @Basic(optional = false)
-    private Long ordersCompletedId;  // foreign key to OrdersCompleted table
+    private String completedOrdersListId;  // foreign key to OrdersCompleted table
     private String term;  // hard coded in format "MM-YYYY"
     private String popularOrderType;  // one of "Cake", "Cookies", "Cupcakes", "Other"
     private Integer biggestOrder;
     private Integer totalOrderIncome;
-    private Integer businessLevel;  // number where 100 is average
+    private Double businessLevel;  // number where 100 is average
 
 
     public ShopStats(){}
 
-    public ShopStats(Long shopStatsId, Long shopId, Long ordersCompletedId, String term, String popularOrderType,
-                     Integer biggestOrder, Integer totalOrderIncome, Integer businessLevel) {
+    public ShopStats(Long shopStatsId, Long shopId, String completedOrdersListId, String term, String popularOrderType,
+                     Integer biggestOrder, Integer totalOrderIncome, Double businessLevel) {
         this.shopStatsId = shopStatsId;
         this.shopId = shopId;
-        this.ordersCompletedId = ordersCompletedId;
+        this.completedOrdersListId = completedOrdersListId;
         this.term = term;
         this.popularOrderType = popularOrderType;
         this.biggestOrder = biggestOrder;
@@ -42,10 +42,10 @@ public class ShopStats {
         this.businessLevel = businessLevel;
     }
 
-    public ShopStats(Long shopId, Long ordersCompletedId, String term, String popularOrderType, Integer biggestOrder,
-                     Integer totalOrderIncome, Integer businessLevel) {
+    public ShopStats(Long shopId, String completedOrdersListId, String term, String popularOrderType, Integer biggestOrder,
+                     Integer totalOrderIncome, Double businessLevel) {
         this.shopId = shopId;
-        this.ordersCompletedId = ordersCompletedId;
+        this.completedOrdersListId = completedOrdersListId;
         this.term = term;
         this.popularOrderType = popularOrderType;
         this.biggestOrder = biggestOrder;
@@ -69,12 +69,12 @@ public class ShopStats {
         this.shopId = shopId;
     }
 
-    public Long getOrdersCompletedId() {
-        return ordersCompletedId;
+    public String getCompletedOrdersListId() {
+        return completedOrdersListId;
     }
 
-    public void setOrdersCompletedId(Long ordersCompletedId) {
-        this.ordersCompletedId = ordersCompletedId;
+    public void setCompletedOrdersListId(String completedOrdersListId) {
+        this.completedOrdersListId = completedOrdersListId;
     }
 
     public String getTerm() {
@@ -109,11 +109,11 @@ public class ShopStats {
         this.totalOrderIncome = totalOrderIncome;
     }
 
-    public Integer getBusinessLevel() {
+    public Double getBusinessLevel() {
         return businessLevel;
     }
 
-    public void setBusinessLevel(Integer businessLevel) {
+    public void setBusinessLevel(Double businessLevel) {
         this.businessLevel = businessLevel;
     }
 
@@ -122,7 +122,7 @@ public class ShopStats {
         return "ShopStats{" +
                 "shopStatsId=" + shopStatsId +
                 ", shopId=" + shopId +
-                ", ordersCompletedId=" + ordersCompletedId +
+                ", ordersCompletedId=" + completedOrdersListId +
                 ", term='" + term + '\'' +
                 ", popularOrderType='" + popularOrderType + '\'' +
                 ", biggestOrder=" + biggestOrder +

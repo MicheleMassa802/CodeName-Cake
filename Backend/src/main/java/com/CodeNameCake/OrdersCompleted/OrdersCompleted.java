@@ -19,16 +19,20 @@ public class OrdersCompleted {
     private Long ordersCompletedId;
     @Basic(optional = false)
     private Long orderId;  // foreign key to Orders table
+    @Basic(optional = false)
+    private String completedOrdersListId;
 
     public OrdersCompleted(){}
 
-    public OrdersCompleted(Long ordersCompletedId, Long orderId) {
+    public OrdersCompleted(Long ordersCompletedId, Long orderId, String completedOrdersListId) {
         this.ordersCompletedId = ordersCompletedId;
         this.orderId = orderId;
+        this.completedOrdersListId = completedOrdersListId;
     }
 
-    public OrdersCompleted(Long orderId) {
+    public OrdersCompleted(Long orderId, String completedOrdersListId) {
         this.orderId = orderId;
+        this.completedOrdersListId = completedOrdersListId;
     }
 
     public Long getOrdersCompletedId() {
@@ -47,11 +51,20 @@ public class OrdersCompleted {
         this.orderId = orderId;
     }
 
+    public String getCompletedOrdersListId() {
+        return completedOrdersListId;
+    }
+
+    public void setCompletedOrdersListId(String completedOrdersListId) {
+        this.completedOrdersListId = completedOrdersListId;
+    }
+
     @Override
     public String toString() {
         return "OrdersCompleted{" +
                 "ordersCompletedId=" + ordersCompletedId +
                 ", orderId=" + orderId +
+                ", completedOrdersListId=" + completedOrdersListId +
                 '}';
     }
 }

@@ -5,12 +5,14 @@ import com.CodeNameCake.OrderDetailField.OrderDetailFieldRequest;
 import com.CodeNameCake.OrderDetailField.OrderDetailFieldService;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfWriter;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -107,8 +109,38 @@ public class OrderService {
         // once done with all order chains ordered, return
         return  orderResponses;
 
-
     }
+
+
+    public List<Order> getTermShopOrders(Long shopId, String term) {
+        String [] monthYear = term.split("-");  // results in ["month", "year"]
+        return orderRepository.getTermOrdersByShopId(shopId, monthYear[1], monthYear[0]);
+    }
+
+    public HashMap<String, Integer> getOrderTypeCount(Long shopId, String term) {
+        String [] monthYear = term.split("-");  // results in ["month", "year"]
+        List<Object[]> termOrderTypeCounts =
+                orderRepository.countShopTermOrderTypes(shopId, monthYear[1], monthYear[0]);
+
+        HashMap<String, Integer> result = new HashMap<>();
+
+        for (Object[] keyValuePair : termOrderTypeCounts) {
+            result.put((String) keyValuePair[0], (Integer) keyValuePair[1]);
+        }
+        return result;
+        // keys should be: "Cake", "Cookies", "Cupcakes", "Other"
+    }
+
+    public int getMaxShopTermOrderCost(Long shopId, String term) {
+        String [] monthYear = term.split("-");  // results in ["month", "year"]
+        return orderRepository.getShopTermMaxCostOrder(shopId, monthYear[1], monthYear[0]);
+    }
+
+    public int getShopTermIncome(Long shopId, String term) {
+        String [] monthYear = term.split("-");  // results in ["month", "year"]
+        return orderRepository.getShopTermIncome(shopId, monthYear[1], monthYear[0]);
+    }
+
 
 
     /////////////////

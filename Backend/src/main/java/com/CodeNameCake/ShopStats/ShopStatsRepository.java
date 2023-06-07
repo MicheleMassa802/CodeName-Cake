@@ -14,11 +14,16 @@ public interface ShopStatsRepository extends JpaRepository<ShopStats, Long> {
     @Query("SELECT s FROM ShopStats s WHERE s.shopId = ?1 ORDER BY to_date(s.term, 'MM-YYYY') DESC")
     List<ShopStats> orderShopStatsByTerm(Long shopId);
 
+    // grouping term and averaging totalOrderIncome
+    @Query("SELECT sum(s.totalOrderIncome), s.term FROM ShopStats s WHERE s.shopId = ?1 GROUP BY s.term")
+    List<Object[]> getShopTermTotalIncome(Long shopId);
+
     // getting a single stats row for the specified shop id and term provided
     @Query("SELECT s FROM ShopStats s WHERE s.shopId = ?1 AND s.term = ?2")
-    Optional<ShopStats> findShopStatsByShopAndTerm(Long shopId, String term);
+    List<ShopStats> findShopStatsByShopAndTerm(Long shopId, String term);
 
-    // deleting all rows where the shopId given matches
+    // getting all rows where the shopId given matches
     @Query("SELECT s FROM ShopStats s WHERE s.shopId = ?1")
     List<ShopStats> findShopStatsByShopId(Long shopId);
+
 }

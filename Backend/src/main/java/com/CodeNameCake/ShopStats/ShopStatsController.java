@@ -18,20 +18,10 @@ public class ShopStatsController {
         this.shopStatsService = shopStatsService;
     }
 
-    @GetMapping
-    public List<ShopStats> getShopStats(){
-        return shopStatsService.getShopStats();
-    }
-
-    @GetMapping(path= "/getShopTermStats/{shopId}/{term}")
-    public ShopStats getShopTermStats(@PathVariable("shopId") Long shopId,
+    @GetMapping(path= "/{shopId}/{term}")
+    public List<ShopStats> getShopTermStats(@PathVariable("shopId") Long shopId,
                                  @PathVariable("term") String term) {
         return shopStatsService.getShopTermStats(shopId, term);
-    }
-
-    @PostMapping
-    public void addShopStats(@RequestBody ShopStats shopStats) {
-        shopStatsService.addShopStats(shopStats);
     }
 
     @DeleteMapping("/{shopId}")
