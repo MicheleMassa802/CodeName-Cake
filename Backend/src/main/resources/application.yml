@@ -18,7 +18,7 @@ spring:
   jpa:
     hibernate:
       # makes it so upon each rerun the db is rebuilt (no data saved)
-      ddl-auto: create-drop
+      ddl-auto: update
     # ddl-auto: update  -> makes it so that DB is not wiped on re-run
     # ddl-auto: create=drop  -> reset on re-run
     properties:
@@ -26,3 +26,5 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     show-sql: true
+  jackson:
+    time-zone: "America/New_York"

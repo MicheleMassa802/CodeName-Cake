@@ -29,7 +29,7 @@ public class ShopStatsController {
         shopStatsService.deleteAllShopStats(shopId);
     }
 
-    @GetMapping(path = "/configureShopStats/{userId}")
+    @PostMapping(path = "/configureShopStats/{userId}")
     public Integer configureShopStats(@PathVariable("userId") Long userId) {
         return shopStatsService.configureShopStats(userId);
     }

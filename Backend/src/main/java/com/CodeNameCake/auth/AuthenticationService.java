@@ -139,6 +139,6 @@ public class AuthenticationService {
         // considering an update to your account information can change critical fields such as email/username/password
         // I return a new token based on it too for it to behave as a re-registration
         var jwtToken = jwtService.generateToken(userToUpdate);  // at this point it's the updated user
-        return AuthenticationResponse.builder().token(jwtToken).build();
+        return AuthenticationResponse.builder().token(jwtToken).userId(userToUpdate.getUserId()).build();
     }
 }

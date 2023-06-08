@@ -36,7 +36,7 @@ public class OrderDetailFieldService {
     public void updateOrderDetail(OrderDetailField orderDetailUpdater) {
         // fetch original order detail, update its fields and save the changes
         Optional<OrderDetailField> originalOrderDetail =
-                orderDetailFieldRepository.findById(orderDetailUpdater.getOrderId());
+                orderDetailFieldRepository.findById(orderDetailUpdater.getOrderDetailFieldId());
 
         OrderDetailField updatedOrderDetail;
 

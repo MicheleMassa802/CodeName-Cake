@@ -11,10 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.sql.Date;
+import java.time.ZoneId;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class OrderService {
@@ -117,15 +119,15 @@ public class OrderService {
         return orderRepository.getTermOrdersByShopId(shopId, monthYear[1], monthYear[0]);
     }
 
-    public HashMap<String, Integer> getOrderTypeCount(Long shopId, String term) {
+    public HashMap<String, Long> getOrderTypeCount(Long shopId, String term) {
         String [] monthYear = term.split("-");  // results in ["month", "year"]
         List<Object[]> termOrderTypeCounts =
                 orderRepository.countShopTermOrderTypes(shopId, monthYear[1], monthYear[0]);
 
-        HashMap<String, Integer> result = new HashMap<>();
+        HashMap<String, Long> result = new HashMap<>();
 
         for (Object[] keyValuePair : termOrderTypeCounts) {
-            result.put((String) keyValuePair[0], (Integer) keyValuePair[1]);
+            result.put((String) keyValuePair[0], (Long) keyValuePair[1]);
         }
         return result;
         // keys should be: "Cake", "Cookies", "Cupcakes", "Other"
@@ -141,6 +143,22 @@ public class OrderService {
         return orderRepository.getShopTermIncome(shopId, monthYear[1], monthYear[0]);
     }
 
+    public String getEarliestOrderTerm(Long shopId) {
+
+        Optional<java.util.Date> earliestOrderDate = orderRepository.getEarliestOrderTerm(shopId);
+        if (earliestOrderDate.isPresent()) {
+            java.util.Date earliestOrderDeliveryDate =earliestOrderDate.get();
+            // get term from that date and return it
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MM-yyyy");
+            return dateFormat.format(earliestOrderDeliveryDate);
+        } else {
+            throw new IllegalStateException(
+                    "No orders have been recorded for this shop, therefore stats cannot be calculated at this moment"
+            );
+        }
+
+    }
+
 
 
     /////////////////
@@ -154,9 +172,12 @@ public class OrderService {
         // so first I'll use the json following the format outlined on the application's notion page to create
         // the order object and save it
 
+        LocalDate today = LocalDate.now();
+        Date dateReceived = Date.valueOf(today);
+
         Order basicOrderObject = new Order(
                 order.getBasic().getShopId(), order.getBasic().getOrderName(),
-                order.getBasic().getDateReceived(), order.getBasic().getDeliveryDate(),
+                dateReceived, order.getBasic().getDeliveryDate(),
                 order.getBasic().getClientContact(), order.getBasic().getExtraNotes(),
                 order.getBasic().getEstimatedCost(), order.getBasic().getOrderType(),
                 order.getBasic().getAttachedFrontOrder(), order.getBasic().getAttachedFrontOrder()
@@ -193,7 +214,7 @@ public class OrderService {
         if (order1Try.isEmpty() || order2Try.isEmpty()) {
             // either order not present means error
             throw new IllegalStateException("One of the provided order Ids: " + orderId1 + " or " + orderId2 +
-                    "does not correspond to a stored order ");
+                    " does not correspond to a stored order ");
         } else {
             // both orders are objects in the db so link them
             Order order1 = order1Try.get();
@@ -305,11 +326,20 @@ public class OrderService {
             Order updatedOrder;
 
             if (originalOrder.isPresent()) {
+                // take the delivery date that might get updated and make it into a localdate
+                LocalDate localDate = fullOrder.getBasic().getDeliveryDate().toInstant()
+                                .atZone(ZoneId.systemDefault()).toLocalDate();
+
+                // Create a new Date object without the time component
+                Date resultDate = Date.valueOf(localDate);
+
+
                 // update the fields of the basic order and those of the order details
                 updatedOrder = originalOrder.get();
                 // don't update id, or shopId, or dateReceived, or orderType, or attachedOrders
                 updatedOrder.setOrderName(fullOrder.getBasic().getOrderName());
-                updatedOrder.setDeliveryDate(fullOrder.getBasic().getDeliveryDate());
+                System.out.println("HERE " + fullOrder.getBasic().getDeliveryDate().toString());
+                updatedOrder.setDeliveryDate(resultDate);
                 updatedOrder.setClientContact(fullOrder.getBasic().getClientContact());
                 updatedOrder.setExtraNotes(fullOrder.getBasic().getClientContact());
                 updatedOrder.setEstimatedCost(fullOrder.getBasic().getEstimatedCost());
@@ -329,6 +359,7 @@ public class OrderService {
         // save the changes (update the orders and orderDetails)
         for (int i = 0; i < updatedOrders.size(); i++) {
             orderRepository.save(updatedOrders.get(i));
+            System.out.println(updatedOrders.get(i).toString());
             for (OrderDetailField orderDetail : updatedOrderDetails.get(i)) {
                 // update each of the details for order i independently
                 orderDetailFieldService.updateOrderDetail(orderDetail);

@@ -75,11 +75,22 @@ public class ShopStatsService {
 
         Long shopId = user.getShopId();
 
+        // if a shop has no orders, then we cant configure stats for it
+        String earliestOrderTerm = orderService.getEarliestOrderTerm(shopId);
+        // this method checks for such condition within the order service
+
         // pull all the data of the shopStats that you have
         List<ShopStats> allShopStats = shopStatsRepository.orderShopStatsByTerm(shopId);
 
         // get the terms to fill
-        List<String> termsToFill = getMonthYearSequencesToFill(allShopStats.get(0).getTerm());
+        List<String> termsToFill;
+
+        if (allShopStats.size() == 0) {
+            // no stats so far => get the earliest term from orders
+            termsToFill = getMonthYearSequencesToFill(earliestOrderTerm, true);
+        } else {
+            termsToFill = getMonthYearSequencesToFill(allShopStats.get(0).getTerm(), false);
+        }
 
         // configure their completed orders table
         ordersCompletedService.registerCompletedOrders(shopId, termsToFill);
@@ -108,13 +119,20 @@ public class ShopStatsService {
 
     }
 
-    public List<String> getMonthYearSequencesToFill(String latestMonthYear){
+    ////////////////////
+    // HELPER METHODS //
+    ////////////////////
+    public List<String> getMonthYearSequencesToFill(String latestMonthYear, boolean firstTimeShopStats){
         List<String> monthYears = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-yyyy");
         YearMonth currentMonthYear = YearMonth.now();
         // take MM-YYYY str to Date format
         YearMonth latestYearMonth = YearMonth.parse(latestMonthYear, formatter);
-        // skip the one that is the latest one on the DB
+
+        // if it is the first time creating shop stats, include the provided monthYear, otw skip it
+        if (firstTimeShopStats) {
+            monthYears.add(latestMonthYear);
+        }
         latestYearMonth = latestYearMonth.plusMonths(1);
 
         while (latestYearMonth.isBefore(currentMonthYear)) {
@@ -126,9 +144,6 @@ public class ShopStatsService {
         return monthYears;
     }
 
-    ////////////////////
-    // HELPER METHODS //
-    ////////////////////
     public List<Object> getTermStats(Long shopId, String term) {
         // term is the term we calculate the business level for is the one specified in the input
         // meaning all stats before that term are invalid when building up averages
@@ -139,10 +154,10 @@ public class ShopStatsService {
         // get the first 3 stats from the current term that you are analyzing from the ordersCompleted class
         String popularOrderType = "";
 
-        HashMap<String, Integer> orderTypeToCount = orderService.getOrderTypeCount(shopId, term);
+        HashMap<String, Long> orderTypeToCount = orderService.getOrderTypeCount(shopId, term);
         // figure out max orderTypeCount
-        int maxValue = 0;
-        for (Map.Entry<String, Integer> orderType : orderTypeToCount.entrySet()) {
+        Long maxValue = 0L;
+        for (Map.Entry<String, Long> orderType : orderTypeToCount.entrySet()) {
             if (orderType.getValue() > maxValue) {
                 popularOrderType = orderType.getKey();
                 maxValue = orderType.getValue();

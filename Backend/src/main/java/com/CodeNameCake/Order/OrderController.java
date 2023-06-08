@@ -43,7 +43,7 @@ public class OrderController {
         return orderService.getShopOrders(shopId, null);
     }
 
-    @GetMapping(path = "/getShopTermOrders/{shopId/{term}")
+    @GetMapping(path = "/getShopTermOrders/{shopId}/{term}")
     public List<List<OrderResponse>> getShopTermOrders(@PathVariable("shopId") Long shopId,
                                          @PathVariable("term") String term) {
         return orderService.getShopOrders(shopId, term);
