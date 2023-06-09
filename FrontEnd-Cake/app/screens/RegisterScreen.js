@@ -1,5 +1,5 @@
 import {React, useState} from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import font_styles from '../../config/generics';
 import colors from '../../config/colors';
 
@@ -7,11 +7,23 @@ const COLORWAY_OPTIONS = ['#e0c4f3', '#ccccff', '#6699ff', '#669999', '#fff2cc']
 
 function RegisterScreen(props) {
     
+    const [routeParams, setRouteParams] = useState({
+        userId: 0,
+        username: '',
+        email: '',
+        shopId: 0,
+        shopName: '',
+        token: '',
+        colorway: '#e0c4f3'
+    });
+
+
     const [username, setUsername] = useState ('');
     const [email, setEmail] = useState('');
     const [shopName, setShopName] = useState('');
     const [colorway, setColorway] = useState('#e0c4f3');  // by default
     const [password, setPassword] = useState('');
+    const [shopId, setShopId] = useState(0);  // by default
     
     const functionStyles = StyleSheet.create({
         button: {
@@ -24,16 +36,94 @@ function RegisterScreen(props) {
 
     const register = () => {
         console.log(`Registering with info: ${username}, ${email}, ${shopName}, ${colorway}, ${password}`);
-        // fetch call to register
+        
+        // check for empty fields
+        if (username === '' || email === '' || shopName === '' || password === '') {
+            alert('Please fill out all fields before registering!');
+            return;
+        }
+
+        // otw, make the fetch calls to register a user
+        
+        const colorwayIndex = COLORWAY_OPTIONS.indexOf(colorway);
+
+        const baseUrl = "http://192.168.0.113:8080/api/dev/";
+        const shopEndpoint = "shop/addShop"
+        const regEndpoint = "auth/register";
+
+        // config vars
+
+        const headers = {
+            // Authorization: `Bearer ${bearerToken}`,
+            'Content-Type': 'application/json'
+        };
+
+        const shopBody = {
+            shopName: shopName,
+            colorwaySelection: colorwayIndex
+        };
+
+        const shopOptions = {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(shopBody)
+        };
+
+
+        // fetch call to add shop
+        fetch(baseUrl + shopEndpoint, shopOptions)
+            .then(response => response.text()) // parse response as text
+            .then(respShopId => {
+                // with the value returned (shopId), set the shopId state
+                setShopId(respShopId);
+                console.log(`Shop creation successful with response: ${shopId}, ${respShopId}`);
+
+                const regBody = {
+                    username: username,
+                    email: email,
+                    password: password,
+                    shopId: respShopId
+                };
+        
+                const regOptions = {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(regBody)
+                };
+        
+                // fetch call to register user
+                fetch(baseUrl + regEndpoint, regOptions)
+                    .then(response => response.json()) // parse response as JSON
+                    .then(data => {
+                        // with the value returned (userId), set the userId 
+                        setRouteParams({
+                            userId: data.userId,
+                            username: username,
+                            email: email,
+                            shopId: respShopId,
+                            shopName: shopName,
+                            token: data.token,
+                            colorway: colorway
+                        });
+                        console.log(`Registration successful with: ${data.userId} and ${data.token}`);
+                    })
+                    .catch(error => {
+                        console.log(`Error registering user: ${error}`);
+                        return;
+                });
+            })
+            .catch(error => {
+                console.log(`Error creating shop: ${error}`);
+                return;
+        });
+
+        console.log("Shop ID " + shopId);
+
         props.navigation.popToTop();
-        props.navigation.push("HomeScreen", {username: username, email: email, shopName: shopName, colorway: colorway, password: password});
+        props.navigation.push("HomeScreen", routeParams);
+
     }
 
-    // console.log("RegisterScreen: username = " + username);
-    // console.log("RegisterScreen: email = " + email);
-    // console.log("RegisterScreen: shopName = " + shopName);
-    // console.log("RegisterScreen: colorway = " + colorway);
-    // console.log("RegisterScreen: password = " + password);
 
     return (
         <View style={styles.container}>
