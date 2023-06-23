@@ -20,7 +20,7 @@ public interface ShopStatsRepository extends JpaRepository<ShopStats, Long> {
 
     // getting a single stats row for the specified shop id and term provided
     @Query("SELECT s FROM ShopStats s WHERE s.shopId = ?1 AND s.term = ?2")
-    List<ShopStats> findShopStatsByShopAndTerm(Long shopId, String term);
+    Optional<ShopStats> findShopStatsByShopAndTerm(Long shopId, String term);
 
     // getting all rows where the shopId given matches
     @Query("SELECT s FROM ShopStats s WHERE s.shopId = ?1")

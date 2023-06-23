@@ -1,6 +1,7 @@
 package com.CodeNameCake.ShopStats;
 
 import com.CodeNameCake.Shop.Shop;
+import com.CodeNameCake.Shop.ShopStatsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,8 +20,8 @@ public class ShopStatsController {
     }
 
     @GetMapping(path= "/{shopId}/{term}")
-    public List<ShopStats> getShopTermStats(@PathVariable("shopId") Long shopId,
-                                 @PathVariable("term") String term) {
+    public ShopStatsResponse getShopTermStats(@PathVariable("shopId") Long shopId,
+                                              @PathVariable("term") String term) {
         return shopStatsService.getShopTermStats(shopId, term);
     }
 
@@ -33,9 +34,5 @@ public class ShopStatsController {
     public Integer configureShopStats(@PathVariable("userId") Long userId) {
         return shopStatsService.configureShopStats(userId);
     }
-
-
-
-
 
 }

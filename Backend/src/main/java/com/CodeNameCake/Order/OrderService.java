@@ -3,12 +3,14 @@ package com.CodeNameCake.Order;
 import com.CodeNameCake.OrderDetailField.OrderDetailField;
 import com.CodeNameCake.OrderDetailField.OrderDetailFieldRequest;
 import com.CodeNameCake.OrderDetailField.OrderDetailFieldService;
+import com.CodeNameCake.ShopStats.ShopStatsService;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfWriter;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -191,9 +193,7 @@ public class OrderService {
             SimpleDateFormat dateFormat = new SimpleDateFormat("MM-yyyy");
             return dateFormat.format(earliestOrderDeliveryDate);
         } else {
-            throw new IllegalStateException(
-                    "No orders have been recorded for this shop, therefore stats cannot be calculated at this moment"
-            );
+            throw new NoOrdersRecordedException();
         }
 
     }
@@ -434,6 +434,15 @@ public class OrderService {
 
         return orderChain;
 
+    }
+
+
+    // custom response status
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public static class NoOrdersRecordedException extends IllegalStateException {
+        public NoOrdersRecordedException() {
+            super("No orders have been recorded for this shop, therefore stats cannot be calculated at this moment");
+        }
     }
 
 }

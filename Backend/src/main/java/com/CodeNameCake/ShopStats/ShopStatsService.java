@@ -1,12 +1,10 @@
 package com.CodeNameCake.ShopStats;
 
 import com.CodeNameCake.Order.OrderService;
-import com.CodeNameCake.OrdersCompleted.OrdersCompleted;
 import com.CodeNameCake.OrdersCompleted.OrdersCompletedService;
-import com.CodeNameCake.Shop.Shop;
 import com.CodeNameCake.Shop.ShopService;
+import com.CodeNameCake.Shop.ShopStatsResponse;
 import com.CodeNameCake.User.UserService;
-import com.CodeNameCake.Shop.ShopRepository;
 import com.CodeNameCake.User.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,8 +38,22 @@ public class ShopStatsService {
     ////////////////
     // GET METHOD //
     ////////////////
-    public List<ShopStats> getShopTermStats(Long shopId, String term) {
-        return shopStatsRepository.findShopStatsByShopAndTerm(shopId, term);
+    public ShopStatsResponse getShopTermStats(Long shopId, String term) {
+        ShopStatsResponse response = new ShopStatsResponse();
+        Optional<ShopStats> statsOptional = shopStatsRepository.findShopStatsByShopAndTerm(shopId, term);
+
+        if (statsOptional.isPresent()) {
+            response.setBasic(statsOptional.get());
+            // set the completed orders
+            response.setOrdersCompleted(
+                    ordersCompletedService.getOrdersCompleted(response.getBasic().getCompletedOrdersListId())
+            );
+        } else {
+            response.setBasic(new ShopStats());
+            response.setOrdersCompleted(new ArrayList<>());
+        }
+        response.setOrdersCompletedLength(response.getOrdersCompleted().size());
+        return response;
     }
 
 
@@ -215,4 +227,5 @@ public class ShopStatsService {
             return false;
         }
     }
+
 }
