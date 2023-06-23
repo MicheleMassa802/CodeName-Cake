@@ -1,4 +1,4 @@
-import { React, useState } from 'react';
+import { React, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView} from 'react-native';                                                                      
 import colors from '../../config/colors';
 import font_styles from '../../config/generics';
@@ -70,31 +70,65 @@ function StatsScreen(props) {
     
     });
 
-    const [month, setMonth] = useState(new Date().getMonth()); // [0, 11] 
+    const [content, setContent] = useState(null);
+    const [month, setMonth] = useState(new Date().getMonth() - 1); // [0, 11] 
     const [year, setYear] = useState(new Date().getFullYear());  // XXXX
-    
-    const content = {
-        ordersCompleted: 10,
-        mostPopularOrderType: "Cake",
-        biggestOrder: "$360",
-        totalRegisteredOrderIncome: "$2100",
-        businessLevel: 102,
-        possibleRepeats: [
-            {
-                name: "John Doe",
-                order: "Cake",
-                date: "12/12/2020",
-                price: "$160"
-            },
-            {
-                name: "Jane Doe",
-                order: "Cake",
-                date: "12/12/2020",
-                price: "$185"
-            },
-        ],
+
+    const getStatsContent = async () => {
+        
+        let term;
+        if (month < 9) {
+            term = "0" + (month + 1) + "-" + year;
+        } else {
+            term = (month + 1) + "-" + year;
+        }
+        const baseUrl = "http://192.168.0.113:8080/api/dev/";
+        const endpoint = "shopStats/" + upperParams.shopId + "/" + term;
+        console.log(`Fetching stats for ${upperParams.shopName} during the period ${term}`);
+        const headers = {
+            Authorization: `Bearer ${upperParams.token}`,
+            'Content-Type': 'application/json'
+        };
+
+        const options = {
+            method: 'GET',
+            headers: headers,
+        };
+
+        const response = await fetch(baseUrl + endpoint, options);
+        const data = await response.json();
+        console.log("Stats data: ", data);
+
+        return data;
     }
 
+    // fetch content when component mounts
+    useEffect(() => {
+        const fetchData = async () => {
+
+            // only perform for past month-year combinations
+            const currentDate = new Date();
+            
+            if (
+                (year < currentDate.getFullYear()) || 
+                (year == currentDate.getFullYear() && month < (currentDate.getMonth()))
+            ) {
+                try {
+                    const data = await getStatsContent();
+                    setContent(data);
+                } catch (error) {
+                    console.log(error);
+                }
+            } else {
+                setContent(null);
+            }
+            
+        };
+
+        fetchData();
+    }, [month, year]);
+
+    // getStatsContent();  // call the function to get the content at the beginning of the render
 
     return (
         <View style={styles.container}>
@@ -124,18 +158,23 @@ function StatsScreen(props) {
             </View>
 
             <View style = {styles.content}>
-                <ScrollView>
-                    <Text style={styles.innerContent}> -Orders Completed: {content.ordersCompleted} </Text>
-                    <Text style={styles.innerContent}> -Business Level: {content.businessLevel} </Text>
-                    <Text style={styles.innerContent}> -Most Popular Order Type: {content.mostPopularOrderType} </Text>
-                    <Text style={styles.innerContent}> -Biggest Order: {content.biggestOrder} </Text>
-                    <Text style={styles.innerContent}> -Total Registered Order Income: {content.totalRegisteredOrderIncome} </Text>
-                    <Text style={styles.innerContent}> -Possible Repeats: </Text>
+                {(!content &&
+                <Text style={styles.innerContent}> No stats available for this term as stats cannot be calculated until
+                the term you have selected has ended. </Text>)}
 
-                    {content.possibleRepeats.map((item, index) => (
-                        <Text key={index} style={styles.innerContent}> {'--> ' + item.name + ': '} {item.order + ' -- '} {item.date + ' -- '} {item.price} </Text>
-                    ))}
-                </ScrollView>
+                {(content && content.ordersCompletedLength === 0 &&
+                <Text style={styles.innerContent}> No stats available as you have no recorded orders for this
+                term. </Text>)}
+
+                {(content && content.ordersCompletedLength > 0 &&
+                <ScrollView>
+                    <Text style={styles.innerContent}> - Term: {content.basic.term} </Text>
+                    <Text style={styles.innerContent}> - Orders Completed: {content.ordersCompletedLength} </Text>
+                    <Text style={styles.innerContent}> - Business Level: {content.basic.businessLevel} </Text>
+                    <Text style={styles.innerContent}> - Most Popular Order Type: {content.basic.popularOrderType} </Text>
+                    <Text style={styles.innerContent}> - Biggest Order: {content.basic.biggestOrder} </Text>
+                    <Text style={styles.innerContent}> - Total Registered Order Income: {content.basic.totalOrderIncome} </Text>
+                </ScrollView>)}
             </View>
 
         </View>

@@ -1,5 +1,6 @@
 import {React, useState} from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { configureShopStats } from '../../config/shopStatsUtil';
 import font_styles from '../../config/generics';
 import colors from '../../config/colors';
 
@@ -84,9 +85,17 @@ function RegisterScreen(props) {
                 fetch(baseUrl + regEndpoint, regOptions)
                     .then(response => response.json()) // parse response as JSON
                     // no reason for it to return a 403 error here
-                    .then(data => {
+                    .then(async data => {
                     
                         console.log(`Registration successful with user: ${JSON.stringify(data)}`);
+
+                        // configure the shop stats
+                        try {
+                            await configureShopStats(baseUrl, data.token, data.userId);
+                        } catch (error) {
+                            console.log(`Error configuring shop stats: ${error}`);
+                            return;
+                        }
 
                         props.navigation.popToTop();
                         props.navigation.push("HomeScreen", {

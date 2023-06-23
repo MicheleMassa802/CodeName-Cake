@@ -1,5 +1,6 @@
 import { React, useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity} from 'react-native';
+import { configureShopStats } from '../../config/shopStatsUtil';
 import Slider from '@react-native-community/slider';
 import font_styles from '../../config/generics';
 import colors from '../../config/colors';
@@ -67,9 +68,18 @@ function LoginScreen(props) {
                 }
                 return response.json()
             })
-            .then(data => {
+            .then(async data => {
 
                 console.log(`Successfuly logged in to user: ${JSON.stringify(data)}`);
+
+                // configure the shop stats
+                try {
+                    await configureShopStats(baseUrl, data.token, data.userId);
+                } catch (error) {
+                    console.log(`Error configuring shop stats: ${error}`);
+                    return;
+                }
+
                 props.navigation.popToTop();
                 
                 props.navigation.push("HomeScreen", {
