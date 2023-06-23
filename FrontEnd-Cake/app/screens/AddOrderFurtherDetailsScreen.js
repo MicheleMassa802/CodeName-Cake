@@ -6,6 +6,105 @@ import font_styles from '../../config/generics';
 
 function AddOrderFurtherDetailsScreen(props) {
 
+    const upperParams = props.route.params;
+    const colorway = upperParams.colorway;
+
+    console.log("Params inherited: ", JSON.stringify(upperParams));
+
+    // Styles
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: colors.white,
+            marginVertical: 20,
+        },
+
+        titleBar: {
+            flex: 0.8,
+            backgroundColor: colorway,
+            borderBottomWidth: 4,
+            borderColor: colors.darker_secondary,
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+
+        detailSection: {
+            flex: 5,
+            marginVertical: 20,
+            marginHorizontal: 10,
+            borderWidth: 2,
+        },
+
+        orderInput: {
+            marginVertical: 5,
+            flex: 1,
+            flexDirection: 'row',
+            justifyContent: 'space-evenly',
+            alignItems: 'center',
+        },
+
+        multipleChoice: {
+            marginVertical: 5,
+            flex: 2,
+            flexDirection: 'row',
+            justifyContent: 'space-evenly',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+        },
+
+        button: {
+            paddingHorizontal: 5,
+            borderRadius: 15,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderWidth: 2,
+            borderColor: colors.black,
+        },
+
+        label: {
+            fontSize: 15,
+            fontWeight: "bold",
+            marginVertical: 5, // equivalent to margin: 10px 0px 10px 0px
+            // fontFamily: "Inconsolata",
+        },
+
+        input: {
+            width: '50%',
+            borderWidth: 1,
+            borderColor: colors.darker_secondary,
+            padding: 5,
+            fontSize: 15,
+            borderRadius: 5,
+        },
+
+        addButtonSection: {
+            flex: 0.08,
+            flexDirection: 'row',
+        },
+
+        addDetailButton: {
+            flex: 1,
+            backgroundColor: colors.secondary,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderTopWidth: 2,
+            borderColor: colors.black,
+        },
+
+        finishButton: {
+            flex: 0.6,
+            backgroundColor: colorway,
+            justifyContent: 'center',
+            alignItems: 'center',
+            margin: 10,
+            marginTop: 0,
+            borderRadius: 50,
+            borderWidth: 2,
+            borderColor: colors.black,
+        },
+
+    });
+
     // constant controlling whether this page is being displayed for creation of a new order or editing of an existing one
     const editing = props.route.params.editing;
     const existingOrderDetails = {
@@ -115,7 +214,13 @@ function AddOrderFurtherDetailsScreen(props) {
 
         // pop the two previous screens off the stack
         props.navigation.popToTop();
-        props.navigation.push("HomeScreen")
+        props.navigation.push("HomeScreen", {
+            userId: upperParams.userId,
+            shopId: upperParams.shopId,
+            shopName: upperParams.shopName,
+            colorway: upperParams.colorway,
+            token: upperParams.token
+        })
     };
 
     // Screen
@@ -198,99 +303,5 @@ function AddOrderFurtherDetailsScreen(props) {
     );
 }
 
-
-// Styles
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.white,
-        marginVertical: 20,
-    },
-
-    titleBar: {
-        flex: 0.8,
-        backgroundColor: colors.primary_default,
-        borderBottomWidth: 4,
-        borderColor: colors.darker_secondary,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-
-    detailSection: {
-        flex: 5,
-        marginVertical: 20,
-        marginHorizontal: 10,
-        borderWidth: 2,
-    },
-
-    orderInput: {
-        marginVertical: 5,
-        flex: 1,
-        flexDirection: 'row',
-        justifyContent: 'space-evenly',
-        alignItems: 'center',
-    },
-
-    multipleChoice: {
-        marginVertical: 5,
-        flex: 2,
-        flexDirection: 'row',
-        justifyContent: 'space-evenly',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-    },
-
-    button: {
-        paddingHorizontal: 5,
-        borderRadius: 15,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 2,
-        borderColor: colors.black,
-    },
-
-    label: {
-        fontSize: 15,
-        fontWeight: "bold",
-        marginVertical: 5, // equivalent to margin: 10px 0px 10px 0px
-        // fontFamily: "Inconsolata",
-    },
-
-    input: {
-        width: '50%',
-        borderWidth: 1,
-        borderColor: colors.darker_secondary,
-        padding: 5,
-        fontSize: 15,
-        borderRadius: 5,
-    },
-
-    addButtonSection: {
-        flex: 0.08,
-        flexDirection: 'row',
-    },
-
-    addDetailButton: {
-        flex: 1,
-        backgroundColor: colors.secondary,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderTopWidth: 2,
-        borderColor: colors.black,
-    },
-
-    finishButton: {
-        flex: 0.6,
-        backgroundColor: colors.primary_default,
-        justifyContent: 'center',
-        alignItems: 'center',
-        margin: 10,
-        marginTop: 0,
-        borderRadius: 50,
-        borderWidth: 2,
-        borderColor: colors.black,
-    },
-
-});
 
 export default AddOrderFurtherDetailsScreen;

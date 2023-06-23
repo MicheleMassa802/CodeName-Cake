@@ -6,6 +6,114 @@ import utils from '../../config/calendarUtil';
 
 function CalendarScreen(props) {
 
+    const upperParams = props.route.params;
+    const colorway = upperParams.colorway;
+
+    console.log("Params inherited: ", JSON.stringify(upperParams));
+
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: colors.white,
+            marginVertical: 20,
+        },
+    
+        titleBar: {
+            flex: 0.8,
+            backgroundColor: colorway,
+            borderBottomWidth: 4,
+            borderColor: colors.darker_secondary,
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+    
+        controlBar: {
+            flex: 0.6,
+            flexDirection: 'row',
+            backgroundColor: colorway,
+            justifyContent: 'space-evenly',
+            alignItems: 'center',
+            // borderTopWidth: 4,
+            borderWidth: 2,
+            borderColor: colors.black,
+            margin: 9,
+            marginTop: 20,
+        },
+    
+        button: {
+            backgroundColor: colors.darker_secondary,
+            borderRadius: 10,
+            paddingHorizontal: '1.5%',
+        },
+    
+        buttonText: {
+            fontSize: 22,
+            fontWeight: "bold",
+            textAlign: "center",
+            color: colors.darker_secondary,
+        },
+    
+        separator: {
+            width: '10%',
+        },
+    
+        calendarSection: {
+            flex: 5,
+            margin: 9,
+            borderWidth: 2,
+        },
+    
+        content: {
+            flex: 1,
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+        },
+    
+        cell: {
+            flexDirection: 'row',
+            width: '25%',
+            height: '12.5%',
+            borderWidth: 1,
+            borderColor: colors.black,
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+    
+        events: {
+            flex: 1,
+            fontSize: 11,
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+    
+        dateContent: {
+            flex: 3,
+            margin: 9,
+            borderWidth: 2,
+        },
+    
+        dateContentTitle: {
+            fontSize: 22,
+            fontWeight: "bold",
+            textAlign: "center",
+            borderBottomColor: colors.darker_secondary,
+            borderBottomWidth: 2,
+            backgroundColor: colorway,
+        }, 
+    
+        dateContentText: {
+            fontSize: 16,
+            fontWeight: "normal",
+            flex: 1,
+            marginTop: 8,
+        },
+
+        orderClick: {
+            
+        },
+    });
+
+
     // for month-year handler
     const [month, setMonth] = useState(new Date().getMonth()); // [0, 11] 
     const [year, setYear] = useState(new Date().getFullYear());  // XXXX
@@ -93,12 +201,21 @@ function CalendarScreen(props) {
         }
     }
 
+    const goToOrder = (orderId) => {
+        // go to the order screen with the selected orders
+        console.log("Going to order: ", orderId);
+        props.navigation.push("ViewReceiptScreen", {
+            ...upperParams,
+            orderId: orderId
+        });
+    }
+
 
     return (
         <View style={styles.container}>
 
             <View style = {styles.titleBar}>
-                <Text style={font_styles.title}> Shop Calendar </Text>
+                <Text style={font_styles.title}> {upperParams.shopName}'s Calendar </Text>
             </View>
         
             <View style = {styles.controlBar}>
@@ -138,109 +255,17 @@ function CalendarScreen(props) {
                     <Text style={styles.dateContentTitle}> {"Orders for " + utils.monthMap[month] + " " + day + ", " + year} </Text>
                     {mayOrders[day].length == 0 ?
                         <Text style={styles.dateContentText}> {"No orders for this day"} </Text> :
-                        mayOrders[day].map((order) => (<Text key={day + "info" + order.id } style={styles.dateContentText}> {"-> " + order.name} </Text>))}
+                        mayOrders[day].map((order) => (
+                        <TouchableOpacity key = {"orderWithId" + order.id} style={styles.orderClick} onPress={() => goToOrder(order.id)}>
+                            <Text key={day + "info" + order.id } style={styles.dateContentText}> {"-> " + order.name} </Text>
+                        </TouchableOpacity>
+                        
+                        ))}
                 </ScrollView>
             </View>
         </View>
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.white,
-        marginVertical: 20,
-    },
-
-    titleBar: {
-        flex: 0.8,
-        backgroundColor: colors.primary_default,
-        borderBottomWidth: 4,
-        borderColor: colors.darker_secondary,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-
-    controlBar: {
-        flex: 0.6,
-        flexDirection: 'row',
-        backgroundColor: colors.primary_default,
-        justifyContent: 'space-evenly',
-        alignItems: 'center',
-        // borderTopWidth: 4,
-        borderWidth: 2,
-        borderColor: colors.black,
-        margin: 9,
-        marginTop: 20,
-    },
-
-    button: {
-        backgroundColor: colors.darker_secondary,
-        borderRadius: 10,
-        paddingHorizontal: '1.5%',
-    },
-
-    buttonText: {
-        fontSize: 22,
-        fontWeight: "bold",
-        textAlign: "center",
-        color: colors.darker_secondary,
-    },
-
-    separator: {
-        width: '10%',
-    },
-
-    calendarSection: {
-        flex: 5,
-        margin: 9,
-        borderWidth: 2,
-    },
-
-    content: {
-        flex: 1,
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-    },
-
-    cell: {
-        flexDirection: 'row',
-        width: '25%',
-        height: '12.5%',
-        borderWidth: 1,
-        borderColor: colors.black,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-
-    events: {
-        flex: 1,
-        fontSize: 11,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-
-    dateContent: {
-        flex: 3,
-        margin: 9,
-        borderWidth: 2,
-    },
-
-    dateContentTitle: {
-        fontSize: 22,
-        fontWeight: "bold",
-        textAlign: "center",
-        borderBottomColor: colors.darker_secondary,
-        borderBottomWidth: 2,
-        backgroundColor: colors.primary_default,
-    }, 
-
-    dateContentText: {
-        fontSize: 16,
-        fontWeight: "normal",
-        flex: 1,
-        marginTop: 8,
-    },
-});
 
 export default CalendarScreen;

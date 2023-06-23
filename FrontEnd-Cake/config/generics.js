@@ -56,7 +56,7 @@ const font_styles = StyleSheet.create({
         fontWeight: "bold",
         // fontFamily: "Inconsolata",
         textAlign: "center",
-        color: colors.darker_secondary,
+        color: colors.black,
 
     },
 

@@ -6,17 +6,6 @@ import colors from '../../config/colors';
 const COLORWAY_OPTIONS = ['#e0c4f3', '#ccccff', '#6699ff', '#669999', '#fff2cc'];
 
 function RegisterScreen(props) {
-    
-    const [routeParams, setRouteParams] = useState({
-        userId: 0,
-        username: '',
-        email: '',
-        shopId: 0,
-        shopName: '',
-        token: '',
-        colorway: '#e0c4f3'
-    });
-
 
     const [username, setUsername] = useState ('');
     const [email, setEmail] = useState('');
@@ -94,18 +83,19 @@ function RegisterScreen(props) {
                 // fetch call to register user
                 fetch(baseUrl + regEndpoint, regOptions)
                     .then(response => response.json()) // parse response as JSON
+                    // no reason for it to return a 403 error here
                     .then(data => {
-                        // with the value returned (userId), set the userId 
-                        setRouteParams({
+                    
+                        console.log(`Registration successful with user: ${JSON.stringify(data)}`);
+
+                        props.navigation.popToTop();
+                        props.navigation.push("HomeScreen", {
                             userId: data.userId,
-                            username: username,
-                            email: email,
-                            shopId: respShopId,
-                            shopName: shopName,
-                            token: data.token,
-                            colorway: colorway
+                            shopId: data.shopId,
+                            shopName: data.shopName,
+                            colorway: colors.getColorByColorwayNumber(data.colorway),
+                            token: data.token
                         });
-                        console.log(`Registration successful with: ${data.userId} and ${data.token}`);
                     })
                     .catch(error => {
                         console.log(`Error registering user: ${error}`);
@@ -116,11 +106,6 @@ function RegisterScreen(props) {
                 console.log(`Error creating shop: ${error}`);
                 return;
         });
-
-        console.log("Shop ID " + shopId);
-
-        props.navigation.popToTop();
-        props.navigation.push("HomeScreen", routeParams);
 
     }
 

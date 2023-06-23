@@ -27,7 +27,17 @@ export default {
 	yellow: '#eae8ae',
 	orange: '#e79c74',
 	red: '#c36666',
-	blue: '#7986cb'
+	blue: '#7986cb',
 
-	
+	getColorByColorwayNumber: function(colorwayNumber) {
+		const colorways = [
+			this.primary_default,
+			this.prim_2,
+			this.prim_3,
+			this.prim_4,
+			this.prim_5,
+		];	
+
+		return colorways[colorwayNumber];
+	}
 }

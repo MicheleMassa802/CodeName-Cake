@@ -5,6 +5,122 @@ import font_styles from '../../config/generics';
 
 function ViewOrdersScreen(props) {
     
+    const upperParams = props.route.params;
+    const colorway = upperParams.colorway;
+
+    console.log("Params inherited: ", JSON.stringify(upperParams));
+
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: colors.white,
+            marginVertical: 20,
+        },
+    
+        half: {
+            flex: 1,
+            alignContent: 'center',
+            justifyContent: 'flex-start',
+    
+        },
+    
+        titleBar: {
+            flex: 1,
+            backgroundColor: colorway,
+            borderBottomWidth: 4,
+            borderColor: colors.darker_secondary,
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+    
+        content: {
+            flex: 7,
+            margin: 20,
+        },
+    
+        contentLine: {
+            width: '100%',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            borderWidth: 1,
+            borderColor: colorway,
+            backgroundColor: colors.secondary,
+            marginBottom: 15,
+        },
+    
+        outerHeadingLine: {
+            flex: 0.5,
+            flexDirection: 'row',
+            // alignContent: 'center',
+            justifyContent: 'flex-start',
+            marginBottom: '5%',
+    
+            // borderWidth: 3,
+            // borderColor: 'red'
+        },
+    
+        headingLine: {
+            flexDirection: 'row',
+            borderWidth: 3,
+            borderColor: colorway,
+            marginBottom: 15,
+        },
+    
+        headingContent: {
+            flex: 1,
+            fontSize: 16,
+            fontWeight : "bold",
+            color: colors.black,
+            textAlign: "center",
+            justifyContent: 'center',
+            alignContent: 'center',
+        },
+    
+        innerContent: {
+            flex: 1,
+            fontSize: 16,
+            fontWeight: "normal",
+            color: colors.black,
+            textAlign: "center",
+        },
+    
+        checkbox: {
+            width: 25,
+            height: 25,
+            backgroundColor: colors.secondary,
+            borderWidth: 1,
+            borderColor: colorway,
+        },
+    
+        lineSelect: {
+            flex: 0.12,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignContent: 'center',
+        },
+    
+        innerCheckbox: {
+            flex: 1,
+            backgroundColor: colorway,
+        },
+    
+        button: {
+            // flex: 0.2,
+            width: '20%',
+            backgroundColor: colorway,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 5,
+            // marginVertical: 7,
+            borderWidth: 1,
+            borderColor: colors.darker_secondary,
+            marginLeft: '5%',
+    
+        },
+    
+    
+    });
+
     const liveOrders = [
         {
             id: 1,
@@ -62,7 +178,10 @@ function ViewOrdersScreen(props) {
     const goToOrder = (orderId) => {
         // go to the order screen with the selected orders
         console.log("Going to order: ", orderId);
-        props.navigation.push("ViewReceiptScreen", {orderId: orderId});
+        props.navigation.push("ViewReceiptScreen", {
+            ...upperParams,
+            orderId: orderId
+        });
     }
 
     const mergeOrders = () => {
@@ -150,121 +269,5 @@ function ViewOrdersScreen(props) {
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.white,
-        marginVertical: 20,
-    },
-
-    half: {
-        flex: 1,
-        alignContent: 'center',
-        justifyContent: 'flex-start',
-
-    },
-
-    titleBar: {
-        flex: 1,
-        backgroundColor: colors.primary_default,
-        borderBottomWidth: 4,
-        borderColor: colors.darker_secondary,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-
-    content: {
-        flex: 7,
-        margin: 20,
-    },
-
-    contentLine: {
-        width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        borderWidth: 1,
-        borderColor: colors.primary_default,
-        backgroundColor: colors.secondary,
-        marginBottom: 15,
-    },
-
-    outerHeadingLine: {
-        flex: 0.5,
-        flexDirection: 'row',
-        // alignContent: 'center',
-        justifyContent: 'flex-start',
-        marginBottom: '5%',
-
-        // borderWidth: 3,
-        // borderColor: 'red'
-    },
-
-    headingLine: {
-        flexDirection: 'row',
-        borderWidth: 3,
-        borderColor: colors.primary_default,
-        marginBottom: 15,
-
-        // borderWidth: 3,
-        // borderColor: 'blue'
-    },
-
-    headingContent: {
-        flex: 1,
-        fontSize: 16,
-        fontWeight : "bold",
-        color: colors.black,
-        textAlign: "center",
-        justifyContent: 'center',
-        alignContent: 'center',
-
-        // borderWidth: 3,
-        // borderColor: 'yellow'
-    },
-
-    innerContent: {
-        flex: 1,
-        fontSize: 16,
-        fontWeight: "normal",
-        color: colors.black,
-        textAlign: "center",
-    },
-
-    checkbox: {
-        width: 25,
-        height: 25,
-        backgroundColor: colors.secondary,
-        borderWidth: 1,
-        borderColor: colors.primary_default,
-    },
-
-    lineSelect: {
-        flex: 0.12,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignContent: 'center',
-    },
-
-    innerCheckbox: {
-        flex: 1,
-        backgroundColor: colors.primary_default,
-    },
-
-    button: {
-        // flex: 0.2,
-        width: '20%',
-        backgroundColor: colors.primary_default,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 5,
-        // marginVertical: 7,
-        borderWidth: 1,
-        borderColor: colors.darker_secondary,
-        marginLeft: '5%',
-
-    },
-
-
-});
 
 export default ViewOrdersScreen;

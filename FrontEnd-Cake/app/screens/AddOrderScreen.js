@@ -8,8 +8,94 @@ import utils from '../../config/calendarUtil';
 
 function AddOrderScreen(props) {
 
+    const upperParams = props.route.params;
+    const colorway = upperParams.colorway;
+
+    console.log("Params inherited: ", JSON.stringify(upperParams));
+
+    // Styles
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: colors.white,
+        marginVertical: 20,
+    },
+
+    titleBar: {
+        flex: 1,
+        backgroundColor: colorway,
+        borderBottomWidth: 4,
+        borderColor: colors.darker_secondary,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+
+    detailSection: {
+        flex: 5,
+        margin: 10,
+
+    },
+
+    orderInput: {
+        marginVertical: 5,
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+    },
+
+    multipleChoice: {
+        marginVertical: 10,
+        flex: 2,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+    },
+
+    button: {
+        marginHorizontal: 10,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 2,
+        borderColor: colors.black,
+        padding: 8,
+        marginVertical: 5,
+    },
+
+    label: {
+        fontSize: 16,
+        fontWeight: "bold",
+        marginVertical: 5, // equivalent to margin: 10px 0px 10px 0px
+        // fontFamily: "Inconsolata",
+    },
+
+    input: {
+        borderWidth: 1,
+        borderColor: colors.darker_secondary,
+        padding: 5,
+        fontSize: 16,
+        borderRadius: 5,
+    },
+
+    continueButton: {
+        flex: 0.5,
+        backgroundColor: colorway,
+        justifyContent: 'center',
+        alignItems: 'center',
+        margin: 10,
+        marginTop: 0,
+        // padding: 15,
+        borderRadius: 50,
+        borderWidth: 2,
+        borderColor: colors.black,
+    },
+
+});
+
     // constant controlling whether this page is being displayed for creation of a new order or editing of an existing one
-    const editing = props.route.params.editing;
+    const editing = upperParams.editing;
     
     const todayString = new Date().toISOString().split('T')[0];
     
@@ -50,7 +136,9 @@ function AddOrderScreen(props) {
     const continueToOrderDetails = () => {
         console.log("Continueing to Order Details");
         // still not a fetch but pass on all the args so far
-        props.navigation.push("AddOrderFurtherDetailsScreen", {editing: editing, order: order});
+        props.navigation.push("AddOrderFurtherDetailsScreen", {
+            ...upperParams,
+            order: order});
     };
 
     const toggleDatePicker = () => { 
@@ -173,19 +261,19 @@ function AddOrderScreen(props) {
                 <View style={styles.multipleChoice}>
                     <Text style={styles.label}>Order Type</Text>
                     <TouchableOpacity style = {[styles.button,
-                        {backgroundColor: order.orderType === "Cake" ? colors.primary_default : colors.secondary}]} onPress={() => handleInputChange('orderType', 'Cake')}>
+                        {backgroundColor: order.orderType === "Cake" ? colorway : colors.secondary}]} onPress={() => handleInputChange('orderType', 'Cake')}>
                         <Text style={font_styles.body}> {"Cake"} </Text>
                     </TouchableOpacity>
                     <TouchableOpacity style = {[styles.button,
-                        {backgroundColor: order.orderType === "Cookies" ? colors.primary_default : colors.secondary}]} onPress={() => handleInputChange('orderType', 'Cookies')}>
+                        {backgroundColor: order.orderType === "Cookies" ? colorway : colors.secondary}]} onPress={() => handleInputChange('orderType', 'Cookies')}>
                         <Text style={font_styles.body}> {"Cookies"} </Text>
                     </TouchableOpacity>
                     <TouchableOpacity style = {[styles.button,
-                        {backgroundColor: order.orderType === "Cupcakes" ? colors.primary_default : colors.secondary}]} onPress={() => handleInputChange('orderType', 'Cupcakes')}>
+                        {backgroundColor: order.orderType === "Cupcakes" ? colorway : colors.secondary}]} onPress={() => handleInputChange('orderType', 'Cupcakes')}>
                         <Text style={font_styles.body}> {"Cupcakes"} </Text>
                     </TouchableOpacity>
                     <TouchableOpacity style = {[styles.button,
-                        {backgroundColor: order.orderType === "Other" ? colors.primary_default : colors.secondary}]} onPress={() => handleInputChange('orderType', 'Other')}>
+                        {backgroundColor: order.orderType === "Other" ? colorway : colors.secondary}]} onPress={() => handleInputChange('orderType', 'Other')}>
                         <Text style={font_styles.body}> {"Other"} </Text>
                     </TouchableOpacity>
                 </View>
@@ -199,85 +287,5 @@ function AddOrderScreen(props) {
 }
 
 
-// Styles
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.white,
-        marginVertical: 20,
-    },
-
-    titleBar: {
-        flex: 1,
-        backgroundColor: colors.primary_default,
-        borderBottomWidth: 4,
-        borderColor: colors.darker_secondary,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-
-    detailSection: {
-        flex: 5,
-        margin: 10,
-
-    },
-
-    orderInput: {
-        marginVertical: 5,
-        flex: 1,
-        flexDirection: 'row',
-        justifyContent: 'space-evenly',
-        alignItems: 'center',
-    },
-
-    multipleChoice: {
-        marginVertical: 10,
-        flex: 2,
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-    },
-
-    button: {
-        marginHorizontal: 10,
-        borderRadius: 20,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 2,
-        borderColor: colors.black,
-        padding: 8,
-        marginVertical: 5,
-    },
-
-    label: {
-        fontSize: 16,
-        fontWeight: "bold",
-        marginVertical: 5, // equivalent to margin: 10px 0px 10px 0px
-        // fontFamily: "Inconsolata",
-    },
-
-    input: {
-        borderWidth: 1,
-        borderColor: colors.darker_secondary,
-        padding: 5,
-        fontSize: 16,
-        borderRadius: 5,
-    },
-
-    continueButton: {
-        flex: 0.5,
-        backgroundColor: colors.primary_default,
-        justifyContent: 'center',
-        alignItems: 'center',
-        margin: 10,
-        marginTop: 0,
-        // padding: 15,
-        borderRadius: 50,
-        borderWidth: 2,
-        borderColor: colors.black,
-    },
-
-});
 
 export default AddOrderScreen;

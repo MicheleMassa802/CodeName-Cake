@@ -7,7 +7,69 @@ import utils from '../../config/calendarUtil';
 
 function StatsScreen(props) {
 
-    const shopName = "<Your Shop Name> \n";
+    const upperParams = props.route.params;
+    const colorway = upperParams.colorway;
+
+    console.log("Params inherited: ", JSON.stringify(upperParams));
+    
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: colors.white,
+            marginVertical: 20,
+        },
+    
+        top: {
+            flex: 1.75,
+            backgroundColor: colors.secondary,
+            alignContent: 'center',
+            justifyContent: 'center',
+    
+        },
+    
+        controlBar: {
+            flex: 1.25,
+            flexDirection: 'row',
+            backgroundColor: colorway,
+            justifyContent: 'space-evenly',
+            alignItems: 'center',
+            borderTopWidth: 4,
+            borderBottomWidth: 4,
+            borderColor: colors.darker_secondary,
+        },
+    
+        content: {
+            flex: 7,
+            // backgroundColor: colors.secondary,
+            margin: 20,
+        },
+    
+        innerContent: {
+            flex: 1,
+            fontSize: 16,
+            fontWeight: "normal",
+            color: colors.black,
+        },
+    
+        button: {
+            backgroundColor: colors.darker_secondary,
+            borderRadius: 10,
+            paddingHorizontal: '1.5%',
+        },
+    
+        buttonText: {
+            fontSize: 22,
+            fontWeight: "bold",
+            textAlign: "center",
+            color: colors.darker_secondary,
+        },
+    
+        separator: {
+            width: '10%',
+        },
+    
+    });
+
     const [month, setMonth] = useState(new Date().getMonth()); // [0, 11] 
     const [year, setYear] = useState(new Date().getFullYear());  // XXXX
     
@@ -38,7 +100,7 @@ function StatsScreen(props) {
         <View style={styles.container}>
 
             <View style = {styles.top}>
-                <Text numberOfLines={2} style={font_styles.title}> {shopName} Statistics </Text>
+                <Text numberOfLines={2} style={font_styles.title}> {upperParams.shopName}'s Statistics </Text>
             </View>
 
             <View style = {styles.controlBar}>
@@ -79,63 +141,5 @@ function StatsScreen(props) {
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.white,
-        marginVertical: 20,
-    },
-
-    top: {
-        flex: 1.75,
-        backgroundColor: colors.secondary,
-        alignContent: 'center',
-        justifyContent: 'center',
-
-    },
-
-    controlBar: {
-        flex: 1.25,
-        flexDirection: 'row',
-        backgroundColor: colors.primary_default,
-        justifyContent: 'space-evenly',
-        alignItems: 'center',
-        borderTopWidth: 4,
-        borderBottomWidth: 4,
-        borderColor: colors.darker_secondary,
-    },
-
-    content: {
-        flex: 7,
-        // backgroundColor: colors.secondary,
-        margin: 20,
-    },
-
-    innerContent: {
-        flex: 1,
-        fontSize: 16,
-        fontWeight: "normal",
-        color: colors.black,
-    },
-
-    button: {
-        backgroundColor: colors.darker_secondary,
-        borderRadius: 10,
-        paddingHorizontal: '1.5%',
-    },
-
-    buttonText: {
-        fontSize: 22,
-        fontWeight: "bold",
-        textAlign: "center",
-        color: colors.darker_secondary,
-    },
-
-    separator: {
-        width: '10%',
-    },
-
-});
 
 export default StatsScreen;

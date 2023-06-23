@@ -7,7 +7,89 @@ import utils from '../../config/calendarUtil';
 
 
 function ViewReceiptScreen(props) {
-    const orderIdParam = props.route.params.orderId;
+
+    const upperParams = props.route.params;
+    const colorway = upperParams.colorway;
+    const orderIdParam = upperParams.orderId;
+
+    console.log("Params inherited: ", JSON.stringify(upperParams));
+    
+    // Styles
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: colors.white,
+            marginVertical: 20,
+        },
+
+        titleBar: {
+            flex: 0.6,
+            backgroundColor: colorway,
+            borderBottomWidth: 4,
+            borderColor: colors.darker_secondary,
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+
+
+        detailSection: {
+            flex: 6,
+            margin: 15,
+
+        },
+
+        sectionDivider: {
+            flex: 0.2,
+            borderBottomWidth: 3,
+            borderColor: colorway,
+            // marginVertical: 30,
+            backgroundColor: colors.secondary,
+        },
+
+        topSectionContent: {
+            flex: 0.9,
+            marginVertical: 20,
+            borderWidth: 2,
+        },
+
+        bottomSectionContent: {
+            flex: 1.3,
+            marginVertical: 20,
+            borderWidth: 2,
+        },
+
+        buttonPair: {
+            flex: 0.25,
+            flexDirection: 'row',
+            justifyContent: 'space-around',
+            marginBottom: 10,
+        },
+
+        subButton : {
+            flex: 1,
+            marginHorizontal: 10,
+            borderRadius: 10,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderWidth: 2,
+            borderColor: colors.black,
+            backgroundColor: colorway,
+        },
+
+        button: {
+            flex: 0.2,
+            marginHorizontal: 10,
+            borderRadius: 10,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderWidth: 2,
+            borderColor: colors.black,
+            padding: 8,
+            marginVertical: 3,
+            backgroundColor: colorway,
+        },
+
+    });
 
     const baseUrl = "http://192.168.0.113:8080/";
     const endpoint = "api/dev/orders/getReceiptPdf/1";
@@ -22,7 +104,7 @@ function ViewReceiptScreen(props) {
     const basicOrderDetails = {
         orderId: "<Order ID>",
         orderName: "<Order Name>",
-        deliveryDate: tomorrow,
+        deliveryDate: tomorrow,  // if set to 'yesterday' you get the effect for past orders
         clientContact: "<Client Contact>",
         extraNotes: "<Extra Notes>",
         estimatedCost: "<Estimated Cost>",
@@ -69,6 +151,7 @@ function ViewReceiptScreen(props) {
     }
 
     const openPDF = () => {
+        // Note: pdf opening requires no authorization
         Linking.openURL(receiptUrl)
         .catch((err) => console.error('An error occurred', err));
     }
@@ -77,13 +160,13 @@ function ViewReceiptScreen(props) {
         console.log("Going to attached order");
         // take the attachedOrder attribute from the corresponding column
         const attachedOrderId = 1;
-        props.navigation.push("ViewReceiptScreen", {orderId: attachedOrderId});
+        props.navigation.push("ViewReceiptScreen", {...upperParams});
     }
 
     const editOrder = () => {
         console.log("Editing order");
         // go to order editing screen
-        props.navigation.push("AddOrderScreen", {editing: true, orderId: orderIdParam});
+        props.navigation.push("AddOrderScreen", {...upperParams, editing: true});
     }
 
     const chainedOrder = true; // true if the attachedOrder field in the order object is not null
@@ -153,84 +236,5 @@ function ViewReceiptScreen(props) {
     );
 }
 
-
-// Styles
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.white,
-        marginVertical: 20,
-    },
-
-    titleBar: {
-        flex: 0.6,
-        backgroundColor: colors.primary_default,
-        borderBottomWidth: 4,
-        borderColor: colors.darker_secondary,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-
-
-    detailSection: {
-        flex: 6,
-        margin: 15,
-
-    },
-
-    sectionDivider: {
-        flex: 0.2,
-        borderBottomWidth: 3,
-        borderColor: colors.primary_default,
-        // marginVertical: 30,
-        backgroundColor: colors.secondary,
-    },
-
-    topSectionContent: {
-        flex: 0.9,
-        marginVertical: 20,
-        borderWidth: 2,
-    },
-
-    bottomSectionContent: {
-        flex: 1.3,
-        marginVertical: 20,
-        borderWidth: 2,
-    },
-
-    buttonPair: {
-        flex: 0.25,
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        marginBottom: 10,
-    },
-
-    subButton : {
-        flex: 1,
-        marginHorizontal: 10,
-        borderRadius: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 2,
-        borderColor: colors.black,
-        backgroundColor: colors.primary_default,
-    },
-
-    button: {
-        flex: 0.2,
-        marginHorizontal: 10,
-        borderRadius: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 2,
-        borderColor: colors.black,
-        padding: 8,
-        marginVertical: 3,
-        backgroundColor: colors.primary_default,
-    },
-
-
-
-});
 
 export default ViewReceiptScreen;

@@ -5,7 +5,8 @@ import font_styles from '../../config/generics';
 import colors from '../../config/colors';
 
 function LoginScreen(props) {
-    
+
+
     const opt1 = 'With Email';
     const opt2 = 'With Username';
 
@@ -26,9 +27,64 @@ function LoginScreen(props) {
 
     const login = () => {
         console.log(`Logging in with info: ${username}, ${email}, ${password}`);
-        // fetch call to register
-        props.navigation.popToTop();
-        props.navigation.push("HomeScreen", {username: username, email: email});
+        
+        // check for empty fields
+        if ((username === '' && email === '') || password === '') {
+            alert('Please fill out all fields before logging in!');
+            return;
+        }
+        
+        // otw, make fetch calls to login the user
+
+        const baseUrl = "http://192.168.0.113:8080/api/dev/";
+        const endpoint = "auth/authenticate"
+
+        // config vars
+
+        const headers = {
+            // Authorization: `Bearer ${bearerToken}`,
+            'Content-Type': 'application/json'
+        };
+
+        const body = {
+            username : username,
+            email : email,
+            password : password
+        }
+
+        const options = {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(body)
+        };
+
+        // fetch call
+        fetch(baseUrl + endpoint, options)
+            .then(response => {
+                if (response.status == 403){
+                    alert("Your login information seems to be incorrect, please re-check and resubmit");
+                    return;
+                }
+                return response.json()
+            })
+            .then(data => {
+
+                console.log(`Successfuly logged in to user: ${JSON.stringify(data)}`);
+                props.navigation.popToTop();
+                
+                props.navigation.push("HomeScreen", {
+                    userId: data.userId,
+                    shopId: data.shopId,
+                    shopName: data.shopName,
+                    colorway: colors.getColorByColorwayNumber(data.colorway),
+                    token: data.token
+                });
+
+            })
+            .catch(error => {
+                console.log(`Error logging in: ${error}`);
+                return;
+        });       
     }
 
     return (
@@ -56,7 +112,6 @@ function LoginScreen(props) {
                 </View>
             </View>
             
-
             { loginOption === opt1 && <View style= {styles.subDiv}>
                 <Text style={font_styles.label}>Email</Text>
                 <TextInput
