@@ -37,6 +37,10 @@ public class OrderService {
     ////////////////////
     public void exportPDF(HttpServletResponse response, Long orderId){
         Document document = new Document(PageSize.A4);
+        // get the order information based on orderId
+
+        List<OrderResponse> orderResponseChain = getSpecificOrder(orderId);
+
         // write pdf from document to the response's output stream
         try {
             PdfWriter.getInstance(document, response.getOutputStream());
@@ -118,6 +122,41 @@ public class OrderService {
         String [] monthYear = term.split("-");  // results in ["month", "year"]
         return orderRepository.getTermOrdersByShopId(shopId, monthYear[1], monthYear[0]);
     }
+
+
+    public List<OrderResponse> getSpecificOrder(Long orderId) {
+        List<OrderResponse> orderResponseChain = new ArrayList<>();
+        // each item of the list makes up the chain that is a full order
+
+        Optional<Order> orderOptional = orderRepository.findById(orderId);
+        Order frontOrder;
+
+        if (orderOptional.isPresent()) {
+            frontOrder = orderOptional.get();
+        } else {
+            throw new IllegalStateException("Order with ID " + orderId + " does not exist");
+        }
+
+        // set up the OrderResponse object based on the possible chain
+        if (frontOrder.getAttachedFrontOrder() == null) {
+            // we are on a front order
+            List<Order> orderChain = getOrderChain(frontOrder);  // make up the order chain
+
+            // for each order in the chain, pull the details and make the orderResponse object
+            for (Order order : orderChain) {
+                OrderResponse orderResponse = new OrderResponse(order,
+                        orderDetailFieldService.getOrderDetails(order.getOrderId()));
+                // add the current order to its response chain
+                orderResponseChain.add(orderResponse);
+            }
+
+        }
+        // otherwise skip (this technically won't happen as only front orders are displayed)
+
+        // once done with all order chains ordered, return
+        return  orderResponseChain;
+    }
+
 
     public HashMap<String, Long> getOrderTypeCount(Long shopId, String term) {
         String [] monthYear = term.split("-");  // results in ["month", "year"]

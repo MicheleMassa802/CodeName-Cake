@@ -49,6 +49,11 @@ public class OrderController {
         return orderService.getShopOrders(shopId, term);
     }
 
+    @GetMapping(path = "/getOrderById/{orderId}")
+    public List<OrderResponse> getOrder(@PathVariable("orderId") Long orderId) {
+        return orderService.getSpecificOrder(orderId);
+    }
+
     @PostMapping
     public void addOrder(@RequestBody OrderRequest order) {
         orderService.addOrder(order);

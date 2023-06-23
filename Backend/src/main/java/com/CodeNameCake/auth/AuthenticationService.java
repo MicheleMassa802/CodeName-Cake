@@ -1,5 +1,7 @@
 package com.CodeNameCake.auth;
 
+import com.CodeNameCake.Shop.Shop;
+import com.CodeNameCake.Shop.ShopRepository;
 import com.CodeNameCake.User.Role;
 import com.CodeNameCake.User.User;
 import com.CodeNameCake.User.UserRepository;
@@ -17,6 +19,7 @@ import java.util.Optional;
 public class AuthenticationService {
 
     private final UserRepository userRepository;
+    private final ShopRepository shopRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
@@ -47,8 +50,20 @@ public class AuthenticationService {
             userRepository.save(newUser);
         }
 
+        // shop should already be created by the time a user it to be created
+        Optional<Shop> shopOptional = shopRepository.findById(newUser.getShopId());
+        Shop newShop;
+
+        if (shopOptional.isPresent()) {
+            newShop = shopOptional.get();
+        } else {
+            // throw exception
+            throw new IllegalStateException("Corresponding shop not found");
+        }
+
         var jwtToken = jwtService.generateToken(newUser);
-        return AuthenticationResponse.builder().token(jwtToken).userId(newUser.getUserId()).build();
+        return AuthenticationResponse.builder().userId(newUser.getUserId()).shopId((newUser.getShopId()))
+                .shopName(newShop.getShopName()).colorway(newShop.getColorwaySelection()).token(jwtToken).build();
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -82,8 +97,12 @@ public class AuthenticationService {
                 .orElseThrow(() -> new IllegalStateException("Account not found"));
         // neither of these exceptions should occur after verification, but it's just a formality
 
+        Shop shop = shopRepository.findById(user.getShopId())
+                .orElseThrow(() -> new IllegalStateException("Corresponding shop not found"));
+
         var jwtToken = jwtService.generateToken(user);
-        return AuthenticationResponse.builder().token(jwtToken).userId(user.getUserId()).build();
+        return AuthenticationResponse.builder().userId(user.getUserId()).shopId((user.getShopId()))
+                .shopName(shop.getShopName()).colorway(shop.getColorwaySelection()).token(jwtToken).build();
 
     }
 

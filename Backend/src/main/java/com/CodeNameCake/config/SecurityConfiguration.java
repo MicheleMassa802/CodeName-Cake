@@ -31,7 +31,8 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests()
                 .requestMatchers(
                         "/api/dev/auth/**", // whitelisted to allow for user creation and auth
-                        "/api/dev/shop/addShop"  // whitelisted to allow for shop creation before user creation
+                        "/api/dev/shop/addShop",  // whitelisted to allow for shop creation before user creation
+                        "/api/dev/orders/getReceiptPdf/**"
                 )
                 // this is the whitelist for endpoints that don't need authentication, like all the auth methods
                 .permitAll()

@@ -11,7 +11,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AuthenticationResponse {
 
-    private String token;
     private Long userId;
+    private Long shopId;
+    private String shopName;
+    private Integer colorway;
+    private String token;
+
 
 }
