@@ -1,12 +1,11 @@
 package com.CodeNameCake.ShopStats;
 
 import com.CodeNameCake.Shop.Shop;
-import com.CodeNameCake.Shop.ShopStatsResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 
 @RestController
 @RequestMapping("/api/dev/shopStats")
@@ -19,14 +18,14 @@ public class ShopStatsController {
         this.shopStatsService = shopStatsService;
     }
 
-    @GetMapping(path= "/{shopId}/{term}")
+    @GetMapping(path = "/{shopId}/{term}")
     public ShopStatsResponse getShopTermStats(@PathVariable("shopId") Long shopId,
-                                              @PathVariable("term") String term) {
+            @PathVariable("term") String term) {
         return shopStatsService.getShopTermStats(shopId, term);
     }
 
     @DeleteMapping("/{shopId}")
-    public void deleteAllShopStats(@PathVariable("shopId") Long shopId){
+    public void deleteAllShopStats(@PathVariable("shopId") Long shopId) {
         shopStatsService.deleteAllShopStats(shopId);
     }
 

@@ -3,7 +3,6 @@ package com.CodeNameCake.ShopStats;
 import com.CodeNameCake.Order.OrderService;
 import com.CodeNameCake.OrdersCompleted.OrdersCompletedService;
 import com.CodeNameCake.Shop.ShopService;
-import com.CodeNameCake.Shop.ShopStatsResponse;
 import com.CodeNameCake.User.UserService;
 import com.CodeNameCake.User.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,14 +25,13 @@ public class ShopStatsService {
 
     @Autowired
     public ShopStatsService(ShopStatsRepository shopStatsRepository, OrdersCompletedService ordersCompletedService,
-                            OrderService orderService, ShopService shopService, UserService userService) {
+            OrderService orderService, ShopService shopService, UserService userService) {
         this.shopStatsRepository = shopStatsRepository;
         this.ordersCompletedService = ordersCompletedService;
         this.orderService = orderService;
         this.shopService = shopService;
         this.userService = userService;
     }
-
 
     ////////////////
     // GET METHOD //
@@ -46,8 +44,7 @@ public class ShopStatsService {
             response.setBasic(statsOptional.get());
             // set the completed orders
             response.setOrdersCompleted(
-                    ordersCompletedService.getOrdersCompleted(response.getBasic().getCompletedOrdersListId())
-            );
+                    ordersCompletedService.getOrdersCompleted(response.getBasic().getCompletedOrdersListId()));
         } else {
             response.setBasic(new ShopStats());
             response.setOrdersCompleted(new ArrayList<>());
@@ -55,7 +52,6 @@ public class ShopStatsService {
         response.setOrdersCompletedLength(response.getOrdersCompleted().size());
         return response;
     }
-
 
     ///////////////////
     // DELETE METHOD //
@@ -74,11 +70,11 @@ public class ShopStatsService {
         }
     }
 
-
     /////////////////
     // POST METHOD //
     /////////////////
-    // Method to configure the stats for all missing terms in the database corresponding to this user's shop
+    // Method to configure the stats for all missing terms in the database
+    ///////////////// corresponding to this user's shop
     // once the user fires up the app after not using it for a while
     public Integer configureShopStats(Long userId) {
 
@@ -108,7 +104,8 @@ public class ShopStatsService {
         ordersCompletedService.registerCompletedOrders(shopId, termsToFill);
 
         for (String term : termsToFill) {
-            // get the order stats for that corresponding term (since last one filled until the prev term)
+            // get the order stats for that corresponding term (since last one filled until
+            // the prev term)
 
             List<Object> termStats = getTermStats(shopId, term);
 
@@ -134,20 +131,21 @@ public class ShopStatsService {
     ////////////////////
     // HELPER METHODS //
     ////////////////////
-    public List<String> getMonthYearSequencesToFill(String latestMonthYear, boolean firstTimeShopStats){
+    public List<String> getMonthYearSequencesToFill(String latestMonthYear, boolean firstTimeShopStats) {
         List<String> monthYears = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-yyyy");
-        YearMonth currentMonthYear = YearMonth.now();
+        YearMonth currentYearMonth = YearMonth.now();
         // take MM-YYYY str to Date format
         YearMonth latestYearMonth = YearMonth.parse(latestMonthYear, formatter);
 
-        // if it is the first time creating shop stats, include the provided monthYear, otw skip it
-        if (firstTimeShopStats) {
+        // if it is the first time creating shop stats, include the provided monthYear,
+        // otw skip it
+        if (firstTimeShopStats && latestYearMonth.isBefore(currentYearMonth)) {
             monthYears.add(latestMonthYear);
         }
         latestYearMonth = latestYearMonth.plusMonths(1);
 
-        while (latestYearMonth.isBefore(currentMonthYear)) {
+        while (latestYearMonth.isBefore(currentYearMonth)) {
             // we don't add the current term, only the previous ones
             monthYears.add(latestYearMonth.format(formatter));
             latestYearMonth = latestYearMonth.plusMonths(1);
@@ -157,13 +155,15 @@ public class ShopStatsService {
     }
 
     public List<Object> getTermStats(Long shopId, String term) {
-        // term is the term we calculate the business level for is the one specified in the input
+        // term is the term we calculate the business level for is the one specified in
+        // the input
         // meaning all stats before that term are invalid when building up averages
 
         List<Object> termStats = new ArrayList<>();
         // of the format [popularOrderType, biggestOrder, totalIncome, businessLevel]
 
-        // get the first 3 stats from the current term that you are analyzing from the ordersCompleted class
+        // get the first 3 stats from the current term that you are analyzing from the
+        // ordersCompleted class
         String popularOrderType = "";
 
         HashMap<String, Long> orderTypeToCount = orderService.getOrderTypeCount(shopId, term);
@@ -185,23 +185,30 @@ public class ShopStatsService {
 
         // get the averages of totalOrderIncome
         List<Object[]> termTotalIncome = shopStatsRepository.getShopTermTotalIncome(shopId);
+
         double pastIncomeAverages;
-        double currentTermIncome = 0;
+        int currentTermIncome = orderService.getShopTermIncome(shopId, term);
 
         // average out those income totals
         double totalIncomeAvg = 0;
         int totalTerms = 0;
-        for (Object[] termIncome : termTotalIncome) {  // each object is [income, term]
-            if (isBefore((String)termIncome[1], term )) {  // when terms are the same or db term is over, not counted
+        for (Object[] termIncome : termTotalIncome) { // each object is [income, term]
+            if (isBefore((String) termIncome[1], term)) { // when terms are the same or db term is over, not counted
                 totalTerms += 1;
-                totalIncomeAvg += (Integer) termIncome[0];
+                totalIncomeAvg += ((Number) termIncome[0]).intValue();
+                System.out.println("INFO " +
+                        " total Terms " + totalTerms +
+                        " term " + termIncome[1] +
+                        " termIncome " + termIncome[0]);
             }
 
         }
 
+
         pastIncomeAverages = totalIncomeAvg / totalTerms;
 
-        // Contrast these scores using the formula score = 100 + (your_score_this_term - average_term_score)
+        // Contrast these scores using the formula score = 100 + (your_score_this_term -
+        // average_term_score)
 
         businessLevel = (currentTermIncome / pastIncomeAverages) * 100;
 

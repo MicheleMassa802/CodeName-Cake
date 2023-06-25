@@ -1,7 +1,7 @@
-package com.CodeNameCake.Shop;
+package com.CodeNameCake.ShopStats;
 
 import com.CodeNameCake.OrdersCompleted.OrdersCompleted;
-import com.CodeNameCake.ShopStats.ShopStats;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
