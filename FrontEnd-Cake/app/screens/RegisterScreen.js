@@ -4,6 +4,8 @@ import { configureShopStats } from '../../config/shopStatsUtil';
 import font_styles from '../../config/generics';
 import colors from '../../config/colors';
 
+import BASE_URL from '../../config/network';
+
 const COLORWAY_OPTIONS = ['#e0c4f3', '#ccccff', '#6699ff', '#669999', '#fff2cc'];
 
 function RegisterScreen(props) {
@@ -37,7 +39,6 @@ function RegisterScreen(props) {
         
         const colorwayIndex = COLORWAY_OPTIONS.indexOf(colorway);
 
-        const baseUrl = "http://192.168.0.113:8080/api/dev/";
         const shopEndpoint = "shop/addShop"
         const regEndpoint = "auth/register";
 
@@ -61,7 +62,7 @@ function RegisterScreen(props) {
 
 
         // fetch call to add shop
-        fetch(baseUrl + shopEndpoint, shopOptions)
+        fetch(BASE_URL + shopEndpoint, shopOptions)
             .then(response => response.text()) // parse response as text
             .then(respShopId => {
                 // with the value returned (shopId), set the shopId state
@@ -82,7 +83,7 @@ function RegisterScreen(props) {
                 };
         
                 // fetch call to register user
-                fetch(baseUrl + regEndpoint, regOptions)
+                fetch(BASE_URL + regEndpoint, regOptions)
                     .then(response => response.json()) // parse response as JSON
                     // no reason for it to return a 403 error here
                     .then(async data => {
@@ -91,7 +92,7 @@ function RegisterScreen(props) {
 
                         // configure the shop stats
                         try {
-                            await configureShopStats(baseUrl, data.token, data.userId);
+                            await configureShopStats(data.token, data.userId);
                         } catch (error) {
                             console.log(`Error configuring shop stats: ${error}`);
                             return;

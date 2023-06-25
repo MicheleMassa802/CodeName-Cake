@@ -4,6 +4,8 @@ import colors from '../../config/colors';
 import font_styles from '../../config/generics';
 import utils from '../../config/calendarUtil';
 
+import BASE_URL from '../../config/network';
+
 
 
 function ViewReceiptScreen(props) {
@@ -91,9 +93,8 @@ function ViewReceiptScreen(props) {
 
     });
 
-    const baseUrl = "http://192.168.0.113:8080/";
     const endpoint = "api/dev/orders/getReceiptPdf/1";
-    const receiptUrl = baseUrl + endpoint;
+    const receiptUrl = BASE_URL + endpoint;
 
     const today = new Date();
     const tomorrow = new Date();

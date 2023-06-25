@@ -21,6 +21,33 @@ const minYear = 2023; // application release date
 const maxDate = `${maxYear}-12-31`;
 const minDate = `${minYear}-01-01`;
 
+const getTodaysDate = () => {
+  const today = new Date();
+  // go back 4 hours to account for time zone differences
+  today.setHours(today.getHours() - 4);
+  // transform into yyyy-mm-dd string
+  let month = today.getMonth() + 1;
+  if (month < 10) {
+    month = "0" + month;
+  } else {
+    month = month.toString();
+  }
+  return `${today.getFullYear()}-${month}-${today.getDate()}`;
+}
+
+const dateToString = (date) => {
+  // subtract 4 hours to account for time zone differences
+  date.setHours(date.getHours() - 4);
+  // transform into yyyy-mm-dd string
+  let month = date.getMonth() + 1;
+  if (month < 10) {
+    month = "0" + month;
+  } else {
+    month = month.toString();
+  }
+  return `${date.getFullYear()}-${month}-${date.getDate()}`;
+}
+
 const prevMonth = (monthInt) => {
   console.log("Prev Month");
   if (monthInt !== 0) {
@@ -64,5 +91,7 @@ export default {
   prevYear,
   nextYear,
   maxDate,
-  minDate
+  minDate,
+  getTodaysDate,
+  dateToString
 };

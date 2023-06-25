@@ -3,11 +3,14 @@ import { View, TextInput, Button, StyleSheet, Text, TouchableOpacity, ScrollView
 import colors from '../../config/colors';
 import font_styles from '../../config/generics';
 
+import BASE_URL from '../../config/network';
+
 
 function AddOrderFurtherDetailsScreen(props) {
 
     const upperParams = props.route.params;
     const colorway = upperParams.colorway;
+    const basic = upperParams.basic;
 
     console.log("Params inherited: ", JSON.stringify(upperParams));
 
@@ -106,7 +109,7 @@ function AddOrderFurtherDetailsScreen(props) {
     });
 
     // constant controlling whether this page is being displayed for creation of a new order or editing of an existing one
-    const editing = props.route.params.editing;
+
     const existingOrderDetails = {
         "Cake Tier #0" : {
             tierSize: "6 inch",
@@ -172,14 +175,14 @@ function AddOrderFurtherDetailsScreen(props) {
         },
     };
     const detailTypes = Object.keys(detailObjects);
-    const chosenOrderType = orderTypes[3];
+    const chosenOrderType = upperParams.basic.orderType;
 
 
     // should know
-    const orderName = "<Order Name>";
+    const orderName = upperParams.basic.orderName;
 
     // States
-    const [orderDetails, setOrderDetails] = useState(editing ? existingOrderDetails : {});
+    const [orderDetails, setOrderDetails] = useState(upperParams.orderDetails);
     const [orderTypeCounter, setOrderTypeCounter] = useState([0, 0, 0, 0, 0]);
     
     console.log(orderDetails);
@@ -197,8 +200,8 @@ function AddOrderFurtherDetailsScreen(props) {
         // add the detail to the orderDetails
         const updatedOrderDetails = {...orderDetails};
         updatedOrderDetails[key] = detailObjects[detailType];
-        console.log(updatedOrderDetails);
-        console.log(key);
+        // console.log(updatedOrderDetails);
+        // console.log(key);
         setOrderDetails(updatedOrderDetails);
     };
 
@@ -208,9 +211,66 @@ function AddOrderFurtherDetailsScreen(props) {
         setOrderDetails(updatedOrderDetails);
     };
 
+    const transformOrderDetailsToJson = () => {
+        const orderDetailsJson = [];
+
+        // for each set of details
+        for (const group in orderDetails) {
+            const groupElements = orderDetails[group];
+            
+            for (const element in groupElements) {
+                const detailJson = {
+                    fieldName: `${group} -- ${element}`,
+                    fieldValue: groupElements[element]
+                };
+
+                orderDetailsJson.push(detailJson);
+            }
+        }
+
+        return orderDetailsJson;
+    };
+
     const finishOrder = () => {
         console.log("Finishing Order");
         // fetch request to backend to add order to database
+        const orderEndpoint = upperParams.editing ? "orders/update" : "orders";
+
+        // config vars
+        const headers = {
+            Authorization: `Bearer ${upperParams.token}`,
+            'Content-Type': 'application/json'
+        };
+
+        const orderBody = {
+            basic : upperParams.basic,
+            orderDetails : transformOrderDetailsToJson(),
+        }
+
+        console.log("\n\n\n ORDER BODY \n\n " + JSON.stringify(orderBody) + "\n\n\n");
+
+        const orderOptions = {
+            method: upperParams.editing ? "PUT" : "POST",
+            headers: headers,
+            body: JSON.stringify(orderBody)
+        };
+
+        fetch(BASE_URL + orderEndpoint, orderOptions)
+            .then(response => {
+                if (response.status === 403) {
+                    alert("You are not authorized to perform this action.");
+                    return;
+                }
+                console.log("Order successfully added to database");
+            })
+            // no data returned from backend
+            .catch(error => {
+                console.log(error);
+                alert("Error adding order: " + error);
+        });
+
+
+
 
         // pop the two previous screens off the stack
         props.navigation.popToTop();
@@ -223,12 +283,39 @@ function AddOrderFurtherDetailsScreen(props) {
         })
     };
 
+
+    const getOrderDetailsViewingFormat = () => {
+        // orderDetails comes in the form: 
+        // [{
+        //     "orderDetailFieldId": x,
+        //     "orderId": n,
+        //     "fieldName": "Group Name -- Property",
+        //     "fieldValue": "Property Value"
+        // }],
+        // want to return an object of form:
+        //  "Group Name : {
+        //    property : property value
+        // }"
+
+        // make the outer dictionary to return
+        
+
+        // for each item in the list, split the fieldname based on the '--' section
+        // then add that as a key to the dictionary with a value of a dictionary with its second half of the split as key and the fieldvalue as value.
+        // do that for all items checking which belong to which dictionary, and then you'll be able to display it just fine
+
+        // Also details cant be added with edits
+
+
+    }  
+
+
     // Screen
     return (
         <View style={styles.container}>
 
             <View style = {styles.titleBar}>
-                <Text style={font_styles.title}> {editing ? "Editing" : "Creating"} Order {orderName} Details </Text>
+                <Text style={font_styles.title}> {upperParams.editing ? "Editing" : "Creating"} Order {orderName} Details </Text>
             </View>
             
             <View style = {styles.detailSection}>

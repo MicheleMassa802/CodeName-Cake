@@ -1,9 +1,10 @@
-import {React, useState } from 'react';
+import {React, useState, useEffect } from 'react';
 import { View, TextInput, Button, StyleSheet, Text, TouchableOpacity, Pressable, Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import colors from '../../config/colors';
 import font_styles from '../../config/generics';
 import utils from '../../config/calendarUtil';
+import BASE_URL from '../../config/network';
 
 
 function AddOrderScreen(props) {
@@ -11,7 +12,7 @@ function AddOrderScreen(props) {
     const upperParams = props.route.params;
     const colorway = upperParams.colorway;
 
-    console.log("Params inherited: ", JSON.stringify(upperParams));
+    // console.log("Params inherited: ", JSON.stringify(upperParams));
 
     // Styles
 const styles = StyleSheet.create({
@@ -97,60 +98,133 @@ const styles = StyleSheet.create({
     // constant controlling whether this page is being displayed for creation of a new order or editing of an existing one
     const editing = upperParams.editing;
     
-    const todayString = new Date().toISOString().split('T')[0];
-    
-    const existingOrder = {
-        orderName: "<Order Name>",
-        deliveryDate: todayString,
-        clientContact: "<Client Contact>",
-        extraNotes: "<Extra Notes>",
-        estimatedCost: "<Estimated Cost>",
-        orderType: "Cake",
-    };
-
+    // today = new Date - 4 hours -> string
+    const todayString = utils.getTodaysDate();
 
     // States
-    const [order, setOrder] = useState({
-        orderName: editing ? existingOrder.orderName : "",
-        deliveryDate: editing ? existingOrder.deliveryDate : todayString,
-        clientContact: editing ? existingOrder.clientContact : "",
-        extraNotes: editing ? existingOrder.extraNotes : "",
-        estimatedCost: editing ? existingOrder.estimatedCost : "",
-        orderType: editing ? existingOrder.orderType : "",
-        // orderDetails: [],
+    const [basic, setBasic] = useState({
+            shopId: upperParams.shopId,
+            orderName: "",
+            dateReceived: todayString,
+            deliveryDate: todayString,
+            clientContact: "",
+            extraNotes: "",
+            estimatedCost: "",
+            orderType:""
+
     });
+    const [orderDetails, setOrderDetails] = useState([]);
     const [showDatePicker, setShowDatePicker] = useState(false);
-    
-    console.log(order.orderName, order.deliveryDate, order.clientContact, order.extraNotes, order.estimatedCost, order.orderType, order.orderDetails);
 
 
     // Functions
+
+    // function to fetch existing order details for when editing mode is on
+    const fetchExistingOrder = async () => {
+        const endpoint = "orders/getOrderById/" + upperParams.orderId;
+
+        const headers = {
+            Authorization: `Bearer ${upperParams.token}`,
+            "Content-Type": "application/json",
+        };
+
+        const options = {
+            method: "GET",
+            headers: headers,
+        };
+
+        const response = await fetch(BASE_URL + endpoint, options)
+            .then(response => {
+                if (response.status === 403) {
+                    alert("Couldn't retrieve the order to edit, please try again later");
+                    props.navigation.pop({ 
+                        userId: upperParams.userId,
+                        shopId: upperParams.shopId,
+                        shopName: upperParams.shopName,
+                        colorway: upperParams.colorway,
+                        token: upperParams.token
+                        // no editing or anything else passed back
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Successfully retrieved order info ", data);
+                return data;
+            })
+            .catch(error => {
+                console.log("Error retrieving order info ", error);
+                alert("Couldn't retrieve the order to edit, please try again later");
+                props.navigation.pop({ 
+                    userId: upperParams.userId,
+                    shopId: upperParams.shopId,
+                    shopName: upperParams.shopName,
+                    colorway: upperParams.colorway,
+                    token: upperParams.token
+                    // no editing or anything else passed back
+                });
+            });
+
+        return response;
+
+    };
+
+
+    // fetch content when component mounts
+    useEffect(() => {
+        const fetchData = async () => {
+
+            // only perform when editing an order
+            
+            if (editing) {
+                try {
+                    const data = await fetchExistingOrder();
+                    setBasic(data.basic);
+                    setOrderDetails(data.orderDetails);
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+            
+        };
+
+        fetchData();
+    }, []);
+
+    // console.log("Data: ", basic.orderName, basic.deliveryDate, basic.clientContact, basic.extraNotes, basic.estimatedCost, basic.orderType, basic.orderDetails);
+
     const handleInputChange = (field, value) => {
         // function to leave the rest of the order as is and only update the field that changed
-        setOrder((prevOrder) => ({
-        ...prevOrder,
+
+        setBasic((prevBasic) => ({
+        ...prevBasic,
         [field]: value,
         }));
     };
     
     const continueToOrderDetails = () => {
-        console.log("Continueing to Order Details");
+        console.log("Continueing to Order Details with order: ", JSON.stringify(basic), JSON.stringify(orderDetails));
         // still not a fetch but pass on all the args so far
         props.navigation.push("AddOrderFurtherDetailsScreen", {
             ...upperParams,
-            order: order});
+            basic: basic,
+            orderDetails: upperParams.editing ? orderDetails : []
+        });
     };
 
     const toggleDatePicker = () => { 
         setShowDatePicker(!showDatePicker); 
     };
 
-    const onDateChange = (date) => {
-        // transform date to be 4 hours behind (EST) to account for timezone difference
-        date.setHours(date.getHours() - 4);
-        // transform the date into a string
-        date = date.toISOString().split('T')[0];
-        handleInputChange('deliveryDate', date);
+    const onDateChange = (event, date) => {
+
+        if (date !== undefined && event.type === "set") {
+            // transform date to be 4 hours behind (EST) to account for timezone difference
+            date.setHours(date.getHours() - 4);
+            // transform the date into a string
+            date = date.toISOString().split('T')[0];
+            handleInputChange('deliveryDate', date);
+        }
         toggleDatePicker();
     };  
 
@@ -172,7 +246,7 @@ const styles = StyleSheet.create({
                     <TextInput
                         style={styles.input}
                         placeholder="Enter Order Name"
-                        value={order.orderName}
+                        value={basic.orderName}
                         onChangeText={(value) => handleInputChange('orderName', value)}
                     />
                 </View>
@@ -183,10 +257,11 @@ const styles = StyleSheet.create({
                     <TextInput
                         style={styles.input}
                         placeholder="Select Delivery Date"
-                        value={order.deliveryDate}
+                        value={basic.deliveryDate}
                         onChangeText={(value) => handleInputChange('deliveryDate', value)}
+                        // onChangeText={(value) => onDateChange(value)}
                         editable={false}
-                        onPressIn={toggleDatePicker}
+                        // onPressIn={toggleDatePicker}
                     />
                 </Pressable>)}
 
@@ -199,8 +274,8 @@ const styles = StyleSheet.create({
                     <DateTimePicker
                         mode="date"
                         display="default"
-                        value={order.deliveryDate}
-                        onChange={(event, date) => onDateChange(date)}
+                        value={new Date(basic.deliveryDate)}
+                        onChange={(event, date) => {onDateChange(event, date)}}
                         minDate={utils.minDate}
                         maxDate={utils.maxDate}
                         style={
@@ -232,7 +307,7 @@ const styles = StyleSheet.create({
                     <TextInput
                         style={styles.input}
                         placeholder="Enter Client Contact"
-                        value={order.clientContact}
+                        value={basic.clientContact}
                         onChangeText={(value) => handleInputChange('clientContact', value)}
                     />
                 </View>
@@ -242,7 +317,7 @@ const styles = StyleSheet.create({
                     <TextInput
                         style={styles.input}
                         placeholder="Include any extra notes here"
-                        value={order.extraNotes}
+                        value={basic.extraNotes}
                         onChangeText={(value) => handleInputChange('extraNotes', value)}
                     />
                 </View>
@@ -253,7 +328,7 @@ const styles = StyleSheet.create({
                         keyboardType="numeric"
                         style={styles.input}
                         placeholder="Enter Estimated Cost"
-                        value={order.estimatedCost}
+                        value={basic.estimatedCost}
                         onChangeText={(value) => handleInputChange('estimatedCost', value)}
                     />
                 </View>
@@ -261,19 +336,19 @@ const styles = StyleSheet.create({
                 <View style={styles.multipleChoice}>
                     <Text style={styles.label}>Order Type</Text>
                     <TouchableOpacity style = {[styles.button,
-                        {backgroundColor: order.orderType === "Cake" ? colorway : colors.secondary}]} onPress={() => handleInputChange('orderType', 'Cake')}>
+                        {backgroundColor: basic.orderType === "Cake" ? colorway : colors.secondary}]} onPress={() => handleInputChange('orderType', 'Cake')}>
                         <Text style={font_styles.body}> {"Cake"} </Text>
                     </TouchableOpacity>
                     <TouchableOpacity style = {[styles.button,
-                        {backgroundColor: order.orderType === "Cookies" ? colorway : colors.secondary}]} onPress={() => handleInputChange('orderType', 'Cookies')}>
+                        {backgroundColor: basic.orderType === "Cookies" ? colorway : colors.secondary}]} onPress={() => handleInputChange('orderType', 'Cookies')}>
                         <Text style={font_styles.body}> {"Cookies"} </Text>
                     </TouchableOpacity>
                     <TouchableOpacity style = {[styles.button,
-                        {backgroundColor: order.orderType === "Cupcakes" ? colorway : colors.secondary}]} onPress={() => handleInputChange('orderType', 'Cupcakes')}>
+                        {backgroundColor: basic.orderType === "Cupcakes" ? colorway : colors.secondary}]} onPress={() => handleInputChange('orderType', 'Cupcakes')}>
                         <Text style={font_styles.body}> {"Cupcakes"} </Text>
                     </TouchableOpacity>
                     <TouchableOpacity style = {[styles.button,
-                        {backgroundColor: order.orderType === "Other" ? colorway : colors.secondary}]} onPress={() => handleInputChange('orderType', 'Other')}>
+                        {backgroundColor: basic.orderType === "Other" ? colorway : colors.secondary}]} onPress={() => handleInputChange('orderType', 'Other')}>
                         <Text style={font_styles.body}> {"Other"} </Text>
                     </TouchableOpacity>
                 </View>

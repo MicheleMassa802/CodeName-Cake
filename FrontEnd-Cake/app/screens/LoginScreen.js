@@ -5,6 +5,8 @@ import Slider from '@react-native-community/slider';
 import font_styles from '../../config/generics';
 import colors from '../../config/colors';
 
+import BASE_URL from '../../config/network';
+
 function LoginScreen(props) {
 
 
@@ -37,7 +39,6 @@ function LoginScreen(props) {
         
         // otw, make fetch calls to login the user
 
-        const baseUrl = "http://192.168.0.113:8080/api/dev/";
         const endpoint = "auth/authenticate"
 
         // config vars
@@ -60,7 +61,7 @@ function LoginScreen(props) {
         };
 
         // fetch call
-        fetch(baseUrl + endpoint, options)
+        fetch(BASE_URL + endpoint, options)
             .then(response => {
                 if (response.status == 403){
                     alert("Your login information seems to be incorrect, please re-check and resubmit");
@@ -74,7 +75,7 @@ function LoginScreen(props) {
 
                 // configure the shop stats
                 try {
-                    await configureShopStats(baseUrl, data.token, data.userId);
+                    await configureShopStats(data.token, data.userId);
                 } catch (error) {
                     console.log(`Error configuring shop stats: ${error}`);
                     return;

@@ -4,6 +4,7 @@ import colors from '../../config/colors';
 import font_styles from '../../config/generics';
 import utils from '../../config/calendarUtil';
 
+import BASE_URL from '../../config/network';
 
 function StatsScreen(props) {
 
@@ -82,7 +83,6 @@ function StatsScreen(props) {
         } else {
             term = (month + 1) + "-" + year;
         }
-        const baseUrl = "http://192.168.0.113:8080/api/dev/";
         const endpoint = "shopStats/" + upperParams.shopId + "/" + term;
         console.log(`Fetching stats for ${upperParams.shopName} during the period ${term}`);
         const headers = {
@@ -95,7 +95,7 @@ function StatsScreen(props) {
             headers: headers,
         };
 
-        const response = await fetch(baseUrl + endpoint, options);
+        const response = await fetch(BASE_URL + endpoint, options);
         const data = await response.json();
         console.log("Stats data: ", data);
 
@@ -170,7 +170,7 @@ function StatsScreen(props) {
                 <ScrollView>
                     <Text style={styles.innerContent}> - Term: {content.basic.term} </Text>
                     <Text style={styles.innerContent}> - Orders Completed: {content.ordersCompletedLength} </Text>
-                    <Text style={styles.innerContent}> - Business Level: {content.basic.businessLevel} </Text>
+                    <Text style={styles.innerContent}> - Business Level: {content.basic.businessLevel}% </Text>
                     <Text style={styles.innerContent}> - Most Popular Order Type: {content.basic.popularOrderType} </Text>
                     <Text style={styles.innerContent}> - Biggest Order: {content.basic.biggestOrder} </Text>
                     <Text style={styles.innerContent}> - Total Registered Order Income: {content.basic.totalOrderIncome} </Text>
