@@ -1,4 +1,4 @@
-import {React } from 'react';
+import {React, useState} from 'react';
 import { View, TextInput, StyleSheet, Text, TouchableOpacity, Pressable, Platform, ScrollView, Linking } from 'react-native';
 import colors from '../../config/colors';
 import font_styles from '../../config/generics';
@@ -13,6 +13,8 @@ function ViewReceiptScreen(props) {
     const upperParams = props.route.params;
     const colorway = upperParams.colorway;
     const orderIdParam = upperParams.orderId;
+
+    const orderObject = upperParams.orderObject;  // the order object to be displayed
 
     console.log("Params inherited: ", JSON.stringify(upperParams));
     
@@ -96,61 +98,6 @@ function ViewReceiptScreen(props) {
     const endpoint = "api/dev/orders/getReceiptPdf/1";
     const receiptUrl = BASE_URL + endpoint;
 
-    const today = new Date();
-    const tomorrow = new Date();
-    tomorrow.setDate(today.getDate() + 1);
-    const yesterday = new Date();
-    yesterday.setDate(today.getDate() - 1);
-
-    const basicOrderDetails = {
-        orderId: "<Order ID>",
-        orderName: "<Order Name>",
-        deliveryDate: tomorrow,  // if set to 'yesterday' you get the effect for past orders
-        clientContact: "<Client Contact>",
-        extraNotes: "<Extra Notes>",
-        estimatedCost: "<Estimated Cost>",
-        orderType: "Cake",
-    }
-
-    // if today is greater than the delivery date, then the order is in the past
-    const futureOrder = today < basicOrderDetails.deliveryDate;
-
-    const furtherOrderDetails = {
-        "Cake Tier #0" : {
-            tierSize: "6 inch",
-            tierCakeFlavor: "Chocolate",
-            tierFillingFlavor: "Vanilla",
-            tierFrostingFlavor: "Chocolate",
-            fondant: "Yes",
-        },
-        "Cake Tier #1" : {
-            tierSize: "8 inch",
-            tierCakeFlavor: "Vanilla",
-            tierFillingFlavor: "Chocolate",
-            tierFrostingFlavor: "Vanilla",
-            fondant: "No",
-        },
-        "Cake Decoration #0" : {
-            decorationType: "Flowers",
-            numberOfDecorations: "10",
-            decorationDescription: "Pink and White",
-        },
-        "Cake Decoration #0" : {
-            decorationType: "Flowers",
-            numberOfDecorations: "10",
-            decorationDescription: "Pink and White",
-        },
-    };
-    
-
-    const getStringDate = (date) => {
-        const day = date.getDate();
-        const month = date.getMonth() + 1;
-        const year = date.getFullYear();
-
-        return day + "-" + month + "-" + year;
-    }
-
     const openPDF = () => {
         // Note: pdf opening requires no authorization
         Linking.openURL(receiptUrl)
@@ -160,17 +107,53 @@ function ViewReceiptScreen(props) {
     const goToAttachedOrder = () => {
         console.log("Going to attached order");
         // take the attachedOrder attribute from the corresponding column
-        const attachedOrderId = 1;
-        props.navigation.push("ViewReceiptScreen", {...upperParams});
+        upperParams.chainPosition += 1;
+        props.navigation.push("ViewReceiptScreen", 
+        {   ...upperParams,
+        });
     }
 
     const editOrder = () => {
         console.log("Editing order");
         // go to order editing screen
+        upperParams.chainPosition = 0;  // reset to the first order in the chain when going to edit
         props.navigation.push("AddOrderScreen", {...upperParams, editing: true});
     }
 
-    const chainedOrder = true; // true if the attachedOrder field in the order object is not null
+    const groupDetails = (details) => {
+        const groupedDetails = {};
+
+        details.forEach((detail) => {
+            // for each detail, split its name into its group (such as "Cake Tier #0") and property
+            const splitName = detail.fieldName.split(" -- ");
+            console.log(splitName)
+            const groupName = splitName[0];
+            const propertyName = splitName[1];
+            const propertyValue = detail.fieldValue;
+
+            // add the group to the groupedDetails object if it doesn't exist with the new property
+            if (!(groupName in groupedDetails)) {
+                groupedDetails[groupName] = { [propertyName] : propertyValue};
+            } else {
+                // otherwise, add the property to the group
+                groupedDetails[groupName][propertyName] = propertyValue;
+            }
+
+        });
+
+        console.log("Grouped details: ", groupedDetails);
+
+        return groupedDetails;
+
+    }
+
+    // Params and values to be displayed
+    const chainPosition = upperParams.chainPosition;
+
+    const basicOrderDetails = orderObject[chainPosition].basic;
+    const furtherOrderDetails = groupDetails(orderObject[chainPosition].orderDetails);
+    const futureOrder = utils.isFuture(basicOrderDetails.deliveryDate);
+    const chainedOrder = basicOrderDetails.attachedNextOrder !== null; // true if the attachedOrder field in the order object is not null
     // means that another screen with the following suborder details should be displayed too
 
 
@@ -190,7 +173,7 @@ function ViewReceiptScreen(props) {
 
                 <View style={styles.topSectionContent}>
                     <Text style={font_styles.body}> Order Name: {basicOrderDetails.orderName} </Text>
-                    <Text style={font_styles.body}> Delivery Date: {getStringDate(basicOrderDetails.deliveryDate)} </Text>
+                    <Text style={font_styles.body}> Delivery Date: {basicOrderDetails.deliveryDate} </Text>
                     <Text style={font_styles.body}> Client Contact: {basicOrderDetails.clientContact} </Text>
                     <Text style={font_styles.body}> Extra Notes: {basicOrderDetails.extraNotes} </Text>
                     <Text style={font_styles.body}> Estimated Cost: {basicOrderDetails.estimatedCost} </Text>

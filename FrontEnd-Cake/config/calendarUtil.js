@@ -105,6 +105,51 @@ const getEmptyCalendar = (year, month) => {
 
   return emptyCal;
 }
+
+const isFuture = (date) => {
+  // date is a string in the format YYYY-MM-DD
+  const otherDate = date.split("-"); // array of [yyyy, mm, dd]
+  const today = getTodaysDate().split("-");  // array of [yyyy, mm, dd]
+
+  // all of this to avoid JS's dogshit date object
+
+  if (otherDate[0] > today[0]) {
+    return true;
+  } else if (otherDate[0] === today[0]) {
+    if (otherDate[1] > today[1]) {
+      return true;
+    } else if (otherDate[1] === today[1]) {
+      if (otherDate[2] >= today[2]) {
+        return true;
+      }
+    }
+  }
+  // otw
+  return false;
+}
+
+const isPast = (date) => {
+  // date is a string in the format YYYY-MM-DD
+  const otherDate = date.split("-"); // array of [yyyy, mm, dd]
+  const today = getTodaysDate().split("-");  // array of [yyyy, mm, dd]
+
+  // all of this to avoid JS's dogshit date object
+
+  if (otherDate[0] < today[0]) {
+    return true;
+  } else if (otherDate[0] === today[0]) {
+    if (otherDate[1] < today[1]) {
+      return true;
+    } else if (otherDate[1] === today[1]) {
+      if (otherDate[2] < today[2]) {
+        return true;
+      }
+    }
+  }
+  // otw
+  return false;
+}
+
   
 export default {
   monthMap,
@@ -116,5 +161,7 @@ export default {
   minDate,
   getTodaysDate,
   dateToString,
-  getEmptyCalendar
+  getEmptyCalendar,
+  isFuture,
+  isPast
 };

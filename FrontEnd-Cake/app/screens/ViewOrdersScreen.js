@@ -8,7 +8,7 @@ function ViewOrdersScreen(props) {
     const upperParams = props.route.params;
     const colorway = upperParams.colorway;
 
-    console.log("Params inherited: ", JSON.stringify(upperParams));
+    // console.log("Params inherited: ", JSON.stringify(upperParams));
 
     const styles = StyleSheet.create({
         container: {

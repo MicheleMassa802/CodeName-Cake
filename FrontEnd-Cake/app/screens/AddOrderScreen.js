@@ -203,8 +203,24 @@ const styles = StyleSheet.create({
     };
     
     const continueToOrderDetails = () => {
+        
+        // check if all required fields are filled in
+        if (basic.orderName === "" || basic.deliveryDate === "" || basic.clientContact === "" || basic.orderType === "") {
+            alert("Please fill in all required fields");
+            return;
+        }
+        
         console.log("Continueing to Order Details with order: ", JSON.stringify(basic), JSON.stringify(orderDetails));
         // still not a fetch but pass on all the args so far
+        
+        // set estimatedCost to 0 if empty or to its respective integer value if not
+        if (basic.estimatedCost === "") {
+            basic.estimatedCost = 0;
+        } else {
+            basic.estimatedCost = parseInt(basic.estimatedCost);
+        }
+        console.log(JSON.stringify(basic));
+
         props.navigation.push("AddOrderFurtherDetailsScreen", {
             ...upperParams,
             basic: basic,
@@ -218,6 +234,8 @@ const styles = StyleSheet.create({
 
     const onDateChange = (event, date) => {
 
+        const initialDate = basic.deliveryDate;
+        
         if (date !== undefined && event.type === "set") {
             // transform date to be 4 hours behind (EST) to account for timezone difference
             date.setHours(date.getHours() - 4);
@@ -226,6 +244,11 @@ const styles = StyleSheet.create({
             handleInputChange('deliveryDate', date);
         }
         toggleDatePicker();
+
+        if (utils.isPast(date)) {
+            alert("You are placing an order for a past month. This will not affect your stats, so please make sure you are placing the order for the correct month.");
+            handleInputChange('deliveryDate', initialDate);
+        }
     };  
 
     // Screen

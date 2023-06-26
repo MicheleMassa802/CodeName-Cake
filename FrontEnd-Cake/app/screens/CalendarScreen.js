@@ -117,6 +117,7 @@ function CalendarScreen(props) {
     const [month, setMonth] = useState(new Date().getMonth()); // [0, 11] 
     const [year, setYear] = useState(new Date().getFullYear());  // XXXX
     const [day, setDay] = useState(new Date().getDate()); // [1, 31]
+    const [orderContent, setOrderContent] = useState([]);  // full orders list
     const [calendarContent, setCalendarContent] = useState(utils.getEmptyCalendar(year, month));  // dictionary of day: [watered down orders]
 
 
@@ -154,6 +155,7 @@ function CalendarScreen(props) {
 
             try {
                 const data = await getCalendarContent();
+                setOrderContent(data);  // set full orders list
                 setCalendarContent(transformOrderFormat(data));  // transform to good format and set
             } catch (error) {
                 alert("Error fetching orders for " + upperParams.shopName + " during the period " + month + "-" + year);
@@ -180,6 +182,7 @@ function CalendarScreen(props) {
             }
 
             const orderObject = {
+                indexIntoOrders: orders.indexOf(order),  // to pass the order object to the order screen
                 id: order[0].basic.orderId,
                 name: order[0].basic.orderName,
             }
@@ -207,12 +210,14 @@ function CalendarScreen(props) {
         }
     }
 
-    const goToOrder = (orderId) => {
+    const goToOrder = (orderId, indexIntoOrders) => {
         // go to the order screen with the selected orders
         console.log("Going to order: ", orderId);
         props.navigation.push("ViewReceiptScreen", {
             ...upperParams,
-            orderId: orderId
+            orderId: orderId,
+            orderObject: orderContent[indexIntoOrders],
+            chainPosition: 0,  // start of order chain
         });
     }
 
@@ -262,7 +267,7 @@ function CalendarScreen(props) {
                     {calendarContent[day].length == 0 ?
                         <Text style={styles.dateContentText}> {"No orders for this day"} </Text> :
                         calendarContent[day].map((order) => (
-                        <TouchableOpacity key = {"orderWithId" + order.id} style={styles.orderClick} onPress={() => goToOrder(order.id)}>
+                        <TouchableOpacity key = {"orderWithId" + order.id} style={styles.orderClick} onPress={() => goToOrder(order.id, order.indexIntoOrders)}>
                             <Text key={day + "info" + order.id } style={styles.dateContentText}> {"-> " + order.name} </Text>
                         </TouchableOpacity>
                         
