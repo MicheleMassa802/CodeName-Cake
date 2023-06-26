@@ -117,6 +117,7 @@ function StatsScreen(props) {
                     const data = await getStatsContent();
                     setContent(data);
                 } catch (error) {
+                    alert("Error fetching stats data");
                     console.log(error);
                 }
             } else {

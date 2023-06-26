@@ -1,16 +1,16 @@
-import { React, useState } from 'react';
+import { React, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView} from 'react-native';                                                                      
 import colors from '../../config/colors';
 import font_styles from '../../config/generics';
 import utils from '../../config/calendarUtil';
+import BASE_URL from '../../config/network';
 
 function CalendarScreen(props) {
 
     const upperParams = props.route.params;
     const colorway = upperParams.colorway;
 
-    console.log("Params inherited: ", JSON.stringify(upperParams));
-
+    // console.log("Params inherited: ", JSON.stringify(upperParams));
     const styles = StyleSheet.create({
         container: {
             flex: 1,
@@ -113,75 +113,81 @@ function CalendarScreen(props) {
         },
     });
 
-
     // for month-year handler
     const [month, setMonth] = useState(new Date().getMonth()); // [0, 11] 
     const [year, setYear] = useState(new Date().getFullYear());  // XXXX
     const [day, setDay] = useState(new Date().getDate()); // [1, 31]
+    const [calendarContent, setCalendarContent] = useState(utils.getEmptyCalendar(year, month));  // dictionary of day: [watered down orders]
 
-    const mayOrders = {  // youd get this in a per month basis
-        1: [  // key is the day of the month
-            {
-                id: 17,
-                name: "John's Son Minion Birthday Cake and cookies",
-            },
-            {
-                id: 18,
-                name: "Jane's baptism Cupcakes",
-            },
-            {
-                id: 19,
-                name: "Laura's Wedding Cake",
-            },
-            {
-                id: 20,
-                name: "Rigobertha's Birthday Cake",
-            }, // value is the object with order name and id (to find the order in the database)
-        ],
-        2: [],
-        3: [],
-        4: [],
-        5: [],
-        6: [],
-        7: [],
-        8: [],
-        9: [],
-        10:[
-            {
-                id: 25,
-                name: "Tiff Cupcakes",
-            },
-            {
-                id: 26,
-                name: "Giveaway Cookies",
-            },
-        ],
-        11:[],
-        12:[],
-        13:[],
-        14:[],
-        15:[],
-        16:[],
-        17:[],
-        18:[],
-        19:[],
-        20:[
-            {
-                id: 23,
-                name: "Dad's Birthday Cake",
-            },
-        ],
-        21:[],
-        22:[],
-        23:[],
-        24:[],
-        25:[],
-        26:[],
-        27:[],
-        28:[],
-        29:[],
-        30:[],
-        31:[],      
+
+    const getCalendarContent = async () => {
+
+        let term;
+        if (month < 9) {
+            term = "0" + (month + 1) + "-" + year;
+        } else {
+            term = (month + 1) + "-" + year;
+        }
+        const endpoint = "orders/getShopTermOrders/" + upperParams.shopId + "/" + term;
+        console.log(`Fetching Orders for ${upperParams.shopName} during the period ${term}`);
+
+        const headers = {
+            Authorization: `Bearer ${upperParams.token}`,
+            'Content-Type': 'application/json'
+        };
+
+        const options = {
+            method: 'GET',
+            headers: headers,
+        };
+
+        const response = await fetch(BASE_URL + endpoint, options);
+        const data = await response.json();
+        // console.log("\n\nOrders: \n\n", JSON.stringify(data), "\n\n");
+
+        return data;
+    }
+
+    // fetch content when component mounts and when month or year changes
+    useEffect(() => {
+        const fetchData = async () => {
+
+            try {
+                const data = await getCalendarContent();
+                setCalendarContent(transformOrderFormat(data));  // transform to good format and set
+            } catch (error) {
+                alert("Error fetching orders for " + upperParams.shopName + " during the period " + month + "-" + year);
+                console.log(error);
+            }
+        }
+
+        fetchData();
+    }, [month, year]);
+
+
+    const transformOrderFormat = (orders) => {
+        // start with an empty calendar
+        const transformed = utils.getEmptyCalendar(year, month); 
+        // for each order within the requested term, get the day, and add an object made up of its id and name
+        // to the transformed dictionary
+
+        orders.forEach(order => {
+            // order is a chain of orders in a list, so get the first one
+            let day = order[0].basic.deliveryDate.split("-")[2];
+            // trim the leading 0 if there is one
+            if (day[0] === "0") {
+                day = day[1];
+            }
+
+            const orderObject = {
+                id: order[0].basic.orderId,
+                name: order[0].basic.orderName,
+            }
+            // push object at its corresponding day's list
+            transformed[day].push(orderObject);
+        });
+
+        return transformed;
     }
 
     const datePressed = (date) => {
@@ -190,11 +196,11 @@ function CalendarScreen(props) {
     }
 
     const determineColor = (date) => {
-        if (mayOrders[date].length == 0) {
+        if (calendarContent[date].length == 0) {
             return colors.green;
-        } else if (mayOrders[date].length < 2) {
+        } else if (calendarContent[date].length < 2) {
             return colors.yellow;
-        } else if (mayOrders[date].length < 4) {
+        } else if (calendarContent[date].length < 4) {
             return colors.orange;
         } else {
             return colors.red;
@@ -241,10 +247,10 @@ function CalendarScreen(props) {
             <View style = {styles.calendarSection}>
                 <ScrollView contentContainerStyle={styles.content}>
                     {/* 4 cells wide, up to 8 tall */}
-                    {Object.keys(mayOrders).map((day) => (
+                    {Object.keys(calendarContent).map((day) => (
                         <TouchableOpacity key={day} style = {[styles.cell, , {backgroundColor: determineColor(day)}]} onPress={() => datePressed(day)}>
                             <Text style={[font_styles.dates, {backgroundColor: determineColor(day)}]}> {day + ": "} </Text>
-                            <Text style={styles.events}> {+ mayOrders[day].length} items </Text>
+                            <Text style={styles.events}> {+ calendarContent[day].length} items </Text>
                         </TouchableOpacity>
                     ))}
                 </ScrollView>
@@ -253,9 +259,9 @@ function CalendarScreen(props) {
             <View style = {styles.dateContent}>
                 <ScrollView>
                     <Text style={styles.dateContentTitle}> {"Orders for " + utils.monthMap[month] + " " + day + ", " + year} </Text>
-                    {mayOrders[day].length == 0 ?
+                    {calendarContent[day].length == 0 ?
                         <Text style={styles.dateContentText}> {"No orders for this day"} </Text> :
-                        mayOrders[day].map((order) => (
+                        calendarContent[day].map((order) => (
                         <TouchableOpacity key = {"orderWithId" + order.id} style={styles.orderClick} onPress={() => goToOrder(order.id)}>
                             <Text key={day + "info" + order.id } style={styles.dateContentText}> {"-> " + order.name} </Text>
                         </TouchableOpacity>

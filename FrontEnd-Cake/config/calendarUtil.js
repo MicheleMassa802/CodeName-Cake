@@ -83,6 +83,28 @@ const nextYear = (yearInt) => {
   // otw
   return yearInt; // which should be current year + 3
 }
+
+const getDaysInMonth = (year, month) => {
+  const date = new Date(year, month, 1);
+  
+  // get to the months last day
+  date.setMonth(date.getMonth() + 1);
+  date.setDate(date.getDate() - 1);
+  // add all days from 1 to the last day into a dictionary and return it
+  return date.getDate();
+}
+
+const getEmptyCalendar = (year, month) => {
+  // get days to fill dictionary with
+  const days = getDaysInMonth(year, month);
+
+  const emptyCal = {}; // made into a dictionary of day:[watered down orders]
+  for (let i = 1; i <= days; i++) {
+    emptyCal[i] = [];
+  }
+
+  return emptyCal;
+}
   
 export default {
   monthMap,
@@ -93,5 +115,6 @@ export default {
   maxDate,
   minDate,
   getTodaysDate,
-  dateToString
+  dateToString,
+  getEmptyCalendar
 };
