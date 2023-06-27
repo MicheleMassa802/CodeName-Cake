@@ -43,6 +43,11 @@ public class OrderController {
         return orderService.getShopOrders(shopId, null);
     }
 
+    @GetMapping(path = "/getRelevantShopOrders/{shopId}")
+    public List<List<OrderResponse>> getRelevantShopOrders(@PathVariable("shopId") Long shopId) {
+        return orderService.getRelevantShopOrders(shopId);
+    }
+
     @GetMapping(path = "/getShopTermOrders/{shopId}/{term}")
     public List<List<OrderResponse>> getShopTermOrders(@PathVariable("shopId") Long shopId,
                                          @PathVariable("term") String term) {

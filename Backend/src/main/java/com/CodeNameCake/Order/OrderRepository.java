@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
     // getting orders by shopId
-    @Query("SELECT o FROM Order o WHERE o.shopId = ?1")
+    @Query("SELECT o FROM Order o WHERE o.shopId = ?1 ORDER BY o.deliveryDate DESC")
     List<Order> getOrdersByShopId(Long shopId);
 
     // getting orders by shopId for a specific term

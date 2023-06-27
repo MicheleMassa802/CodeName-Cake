@@ -4,12 +4,8 @@ import com.CodeNameCake.OrderDetailField.OrderDetailField;
 import com.CodeNameCake.OrderDetailField.OrderDetailFieldRequest;
 import com.CodeNameCake.OrderDetailField.OrderDetailFieldService;
 import com.CodeNameCake.Shop.Shop;
-import com.CodeNameCake.Shop.ShopRepository;
 import com.CodeNameCake.Shop.ShopService;
 import com.lowagie.text.*;
-import com.lowagie.text.pdf.PdfPCell;
-import com.lowagie.text.pdf.PdfPTable;
-import com.lowagie.text.pdf.PdfTable;
 import com.lowagie.text.pdf.PdfWriter;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +23,9 @@ import java.util.List;
 
 @Service
 public class OrderService {
+
+    private static final int PAST_ORDERS = 5;
+    private static final int FUTURE_ORDERS = 10;
 
     private final OrderRepository orderRepository;
     private final OrderDetailFieldService orderDetailFieldService;
@@ -266,6 +265,77 @@ public class OrderService {
         // once done with all order chains ordered, return
         return  orderResponseChain;
     }
+
+
+    public List<List<OrderResponse>> getRelevantShopOrders(Long shopId) {
+        // get the shop orders in decreasing deliveryDate order
+        List<List<OrderResponse>> sortedOrders = getShopOrders(shopId, null);
+
+        if (sortedOrders.size() == 0) {
+            return new ArrayList<>();
+        }
+
+        // start iterating through this list, and stop when you see today's date has passed (on the first element)
+
+        List<List<OrderResponse>> closestDateOrders = new ArrayList<>();
+        // fill the empty spaces of orders that don't meet the 10 / 5 requirement with empty lists
+
+        // today's date
+        LocalDate todayLocal = LocalDate.now();
+        Date today = Date.valueOf(todayLocal);
+
+        int firstPastIndex = sortedOrders.size();  // at most, no past orders are registered
+        int i;
+        for (i = 0; i < sortedOrders.size(); i++) {
+            // get the order's date and check if it's before today (past)
+            java.util.Date orderDate = sortedOrders.get(i).get(0).getBasic().getDeliveryDate();
+            System.out.println("\n\n Today VS date: " + today + "---" + orderDate + "\n\n");
+            if (orderDate.before(today)) {
+                // order date is in the past, so break out of the loop
+                firstPastIndex = i;
+                break;
+            }
+            // otw you are still in future orders so keep looking
+        }
+
+        // get past orders
+        int pastIndex = firstPastIndex;
+        int pastCounter = 0;
+        while (pastIndex < sortedOrders.size() && pastCounter < PAST_ORDERS) {
+            // add past order
+            closestDateOrders.add(sortedOrders.get(pastIndex));
+
+            // go one further order into the past
+            pastIndex += 1;
+            pastCounter+= 1;
+        }
+
+        // check for if there's not enough past orders to fill in the first 5 spots
+        for (int j = pastCounter; j < PAST_ORDERS; j++) {
+            closestDateOrders.add(new ArrayList<>());
+        }
+
+        // get future orders
+        int futureIndex = firstPastIndex - 1;
+        int futureCounter = 0;
+        while (futureIndex >= 0 && futureCounter < FUTURE_ORDERS) {
+            // add future orders
+            closestDateOrders.add(sortedOrders.get(futureIndex));
+
+            // go one further order into the future
+            futureIndex -= 1;
+            futureCounter += 1;
+        }
+
+        // check if there's not enough future orders to fill in the last 10 spots
+        for (int k = futureCounter; k < FUTURE_ORDERS; k++) {
+            closestDateOrders.add(new ArrayList<>());
+        }
+
+
+        return closestDateOrders;
+    }
+
 
 
     public HashMap<String, Long> getOrderTypeCount(Long shopId, String term) {
