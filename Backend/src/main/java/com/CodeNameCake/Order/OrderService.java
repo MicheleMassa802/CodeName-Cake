@@ -3,8 +3,13 @@ package com.CodeNameCake.Order;
 import com.CodeNameCake.OrderDetailField.OrderDetailField;
 import com.CodeNameCake.OrderDetailField.OrderDetailFieldRequest;
 import com.CodeNameCake.OrderDetailField.OrderDetailFieldService;
-import com.CodeNameCake.ShopStats.ShopStatsService;
+import com.CodeNameCake.Shop.Shop;
+import com.CodeNameCake.Shop.ShopRepository;
+import com.CodeNameCake.Shop.ShopService;
 import com.lowagie.text.*;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfTable;
 import com.lowagie.text.pdf.PdfWriter;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +30,14 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderDetailFieldService orderDetailFieldService;
+    private final ShopService shopService;
 
     @Autowired
-    public OrderService(OrderRepository orderRepository, OrderDetailFieldService orderDetailFieldService) {
+    public OrderService(OrderRepository orderRepository, OrderDetailFieldService orderDetailFieldService,
+                        ShopService shopService) {
         this.orderRepository = orderRepository;
         this.orderDetailFieldService = orderDetailFieldService;
+        this.shopService = shopService;
     }
 
 
@@ -43,26 +51,126 @@ public class OrderService {
 
         List<OrderResponse> orderResponseChain = getSpecificOrder(orderId);
 
+        // get shopName through the order's shopId
+        Shop orderShop = shopService.getShop(orderResponseChain.get(0).getBasic().getShopId());
+
         // write pdf from document to the response's output stream
         try {
             PdfWriter.getInstance(document, response.getOutputStream());
 
             // writing on doc
             document.open();
+
+
             Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
             titleFont.setSize(24);
+            Font subTitleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
+            subTitleFont.setSize(16);
+            Font detailTitle = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
+            subTitleFont.setSize(13);
             Font contentFont = FontFactory.getFont(FontFactory.HELVETICA);
             contentFont.setSize(13);
 
-            Paragraph title = new Paragraph("<Shop Name>'s Order Receipt: " + orderId, titleFont);
+            Paragraph title = new Paragraph("Shop " + orderShop.getShopName() + " Order Receipt: " + orderId,
+                    titleFont);
             title.setAlignment(Paragraph.ALIGN_CENTER);
 
-            Paragraph content = new Paragraph("This is some content", contentFont);
-            content.setAlignment(Paragraph.ALIGN_LEFT);
+            Paragraph date = new Paragraph("Delivered On : " +
+                    orderResponseChain.get(0).getBasic().getDeliveryDate().toString(), subTitleFont);
+            date.setAlignment(Paragraph.ALIGN_LEFT);
 
-            // add content to doc
+            Paragraph blankLine = new Paragraph(" ");
+            document.add(blankLine);
+
+            // add title and date to doc
             document.add(title);
-            document.add(content);
+            document.add(blankLine);
+            document.add(date);
+            document.add(blankLine);
+            document.add(blankLine);
+
+            int orderNumber = 1;
+            int totalCost = 0;
+            for (OrderResponse order : orderResponseChain) {
+
+                // make the required subheadings
+                Paragraph subtitle = new Paragraph("Order Item # " + orderNumber, subTitleFont);
+                subtitle.setAlignment(Paragraph.ALIGN_LEFT);
+
+                // cost to the right
+                Paragraph orderItemPrice = new Paragraph("Price: " + order.getBasic().getEstimatedCost(), contentFont);
+                orderItemPrice.setAlignment(Paragraph.ALIGN_RIGHT);
+
+                document.add(subtitle);
+                document.add(orderItemPrice);
+                document.add(blankLine);
+
+                // order content
+                Paragraph content;
+
+                // -- basic details
+                content = new Paragraph("--> " + order.getBasic().getOrderName() +
+                        " ---- TYPE: " + order.getBasic().getOrderType(), contentFont);
+                content.setAlignment(Paragraph.ALIGN_LEFT);
+                document.add(content);
+                document.add(blankLine);
+
+                // get the beyond basic details in by groups:
+
+                Optional<HashMap<String, HashMap<String, String>>> groupedDetailsOptional =
+                        groupOrderDetails(order.getOrderDetails());
+                HashMap<String, HashMap<String, String>> groupedDetails;
+
+                if (groupedDetailsOptional.isPresent()) {
+                    groupedDetails = groupedDetailsOptional.get();
+
+                    // for each inner mapping, add its group name and its detail:value pairs
+
+                    for (String groupName : groupedDetails.keySet()) {
+
+                        content = new Paragraph("       " + groupName, detailTitle);
+                        content.setAlignment(Paragraph.ALIGN_LEFT);
+                        document.add(content);
+
+                        // get the value (its respective property:value pairs) and add them
+                        HashMap<String, String> group = groupedDetails.get(groupName);
+
+                        for (String property : group.keySet()) {
+                            content = new Paragraph("       " + property + " -- " + group.get(property),
+                                    contentFont);
+                            content.setAlignment(Paragraph.ALIGN_LEFT);
+                            document.add(content);
+                        }
+
+                    }
+
+                    document.add(blankLine);
+
+                }
+                // else : no order details to add, so just skip this section
+
+                // update loop vars
+                orderNumber += 1;
+                totalCost += order.getBasic().getEstimatedCost();
+            }
+
+            // do a cross line
+            document.add(blankLine);
+            Paragraph resultLine = new Paragraph("----------------------------------------------------------" +
+                    "--------------------------------------------------------------");
+            resultLine.setAlignment(Paragraph.ALIGN_CENTER);
+            document.add(resultLine);
+            document.add(blankLine);
+
+            // Total Cost:
+            Paragraph total = new Paragraph("Total: $", subTitleFont);
+            total.setAlignment(Paragraph.ALIGN_LEFT);
+
+            Paragraph totalPrice = new Paragraph(" " + totalCost, subTitleFont);
+            totalPrice.setAlignment(Paragraph.ALIGN_RIGHT);
+
+            document.add(total);
+            document.add(totalPrice);
 
             // close doc
             document.close();
@@ -434,6 +542,40 @@ public class OrderService {
 
         return orderChain;
 
+    }
+
+
+    public Optional<HashMap<String, HashMap<String, String>>> groupOrderDetails (List<OrderDetailField> orderDetails) {
+
+        if (orderDetails.size() == 0) {
+            return Optional.empty();
+        } else {
+
+            // otherwise
+
+            HashMap<String, HashMap<String, String>> groupedDetails = new HashMap<>();
+
+            // for each detail, we split its name into its group and property with its corresponding value through the '--'
+
+            for (OrderDetailField orderDetail : orderDetails) {
+                String[] splitName = orderDetail.getFieldName().split(" -- ");  // returns [group, property]
+                String propertyValue = orderDetail.getFieldValue();
+                String groupName = splitName[0];
+                String propertyName = splitName[1];
+
+                // add a new key-value pair to the outer hashmap (a new group) if it's not already included
+                if (!groupedDetails.containsKey(groupName)) {
+                    HashMap<String, String> innerMap = new HashMap<>();
+                    innerMap.put(propertyName, propertyValue);
+                    groupedDetails.put(groupName, innerMap);
+                } else {
+                    groupedDetails.get(groupName).put(propertyName, propertyValue);
+                }
+
+            }
+            return Optional.of(groupedDetails);
+
+        }
     }
 
 

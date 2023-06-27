@@ -24,7 +24,6 @@ public class ShopService {
     }
 
 
-
     public Shop getShop(Long shopId) {
         Optional<Shop> shop = shopRepository.findById(shopId);
 
