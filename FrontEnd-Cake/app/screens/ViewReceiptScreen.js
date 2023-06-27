@@ -16,7 +16,7 @@ function ViewReceiptScreen(props) {
 
     const orderObject = upperParams.orderObject;  // the order object to be displayed
 
-    console.log("Params inherited: ", JSON.stringify(upperParams));
+    // console.log("Params inherited: ", JSON.stringify(upperParams));
     
     // Styles
     const styles = StyleSheet.create({
@@ -95,8 +95,9 @@ function ViewReceiptScreen(props) {
 
     });
 
-    const endpoint = "api/dev/orders/getReceiptPdf/1";
+    const endpoint = "orders/getReceiptPdf/" + upperParams.orderId;
     const receiptUrl = BASE_URL + endpoint;
+    console.log("Receipt URL: ", receiptUrl);
 
     const openPDF = () => {
         // Note: pdf opening requires no authorization
@@ -126,7 +127,6 @@ function ViewReceiptScreen(props) {
         details.forEach((detail) => {
             // for each detail, split its name into its group (such as "Cake Tier #0") and property
             const splitName = detail.fieldName.split(" -- ");
-            console.log(splitName)
             const groupName = splitName[0];
             const propertyName = splitName[1];
             const propertyValue = detail.fieldValue;
