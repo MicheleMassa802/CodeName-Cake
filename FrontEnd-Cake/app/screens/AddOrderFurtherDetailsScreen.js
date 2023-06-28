@@ -110,28 +110,6 @@ function AddOrderFurtherDetailsScreen(props) {
 
     // constant controlling whether this page is being displayed for creation of a new order or editing of an existing one
 
-    const existingOrderDetails = {
-        "Cake Tier #0" : {
-            tierSize: "6 inch",
-            tierCakeFlavor: "Chocolate",
-            tierFillingFlavor: "Vanilla",
-            tierFrostingFlavor: "Chocolate",
-            fondant: "Yes",
-        },
-        "Cake Tier #1" : {
-            tierSize: "8 inch",
-            tierCakeFlavor: "Vanilla",
-            tierFillingFlavor: "Chocolate",
-            tierFrostingFlavor: "Vanilla",
-            fondant: "No",
-        },
-        "Cake Decoration #0" : {
-            decorationType: "Flowers",
-            numberOfDecorations: "10",
-            decorationDescription: "Pink and White",
-        },
-    };
-
     // constant structures
     const orderTypes = [
         "Cake",

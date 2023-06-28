@@ -16,7 +16,7 @@ function ViewReceiptScreen(props) {
 
     const orderObject = upperParams.orderObject;  // the order object to be displayed
 
-    // console.log("Params inherited: ", JSON.stringify(upperParams));
+    console.log("Params inherited: ", JSON.stringify(upperParams));
     
     // Styles
     const styles = StyleSheet.create({
