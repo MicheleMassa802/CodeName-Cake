@@ -469,32 +469,32 @@ public class OrderService {
         // at this point, tempOrder is the last order in the order1 chain, so it's next must become
         // order2's id
 
-        order1.setAttachedNextOrder(order2.getOrderId());
+        tempOrder.setAttachedNextOrder(order2.getOrderId());
 
         // set each of order2's chain of orders to have their .attachedFrontOrder to be order1.orderId
         Long newFront = order1.getOrderId();
 
         List<Order> ordersToUpdateChain2 = new ArrayList<>();
-        tempOrder = order2;
-        tempOrder.setAttachedFrontOrder(newFront);
-        ordersToUpdateChain2.add(tempOrder);
+        Order tempOrder2 = order2;
+        tempOrder2.setAttachedFrontOrder(newFront);
+        ordersToUpdateChain2.add(tempOrder2);
 
-        while (tempOrder.getAttachedNextOrder() != null) {
+        while (tempOrder2.getAttachedNextOrder() != null) {
             // fetch the next attached order and add it to the list until the order is null
-            Optional<Order> middleOrder = orderRepository.findById(tempOrder.getAttachedNextOrder());
+            Optional<Order> middleOrder = orderRepository.findById(tempOrder2.getAttachedNextOrder());
 
             if (middleOrder.isPresent()) {
                 // get, update the front, add to list
-                tempOrder = middleOrder.get();
-                tempOrder.setAttachedFrontOrder(newFront);
-                ordersToUpdateChain2.add(tempOrder);
+                tempOrder2 = middleOrder.get();
+                tempOrder2.setAttachedFrontOrder(newFront);
+                ordersToUpdateChain2.add(tempOrder2);
             } else {
                 throw new IllegalStateException("Invalid order chain");
             }
         }
 
         // update the DB objects if you successfully get up to this point
-        orderRepository.save(order1);
+        orderRepository.save(tempOrder);
         orderRepository.saveAll(ordersToUpdateChain2);
 
     }
