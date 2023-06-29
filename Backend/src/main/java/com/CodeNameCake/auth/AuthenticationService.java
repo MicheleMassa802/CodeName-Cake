@@ -12,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.util.Optional;
 
 @Service
@@ -68,15 +69,20 @@ public class AuthenticationService {
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         // only email OR username sent to log in
-        boolean loginWithUsername = request.getEmail().equals(""); // if email is "", login is done with username
+        boolean usernamePresent = !request.getUsername().equals(""); // && request.getUserId() == 0;
+        boolean emailPresent = !request.getEmail().equals(""); // && request.getUserId() == 0;
+        boolean userIdPresent = request.getUserId() != 0; //request.getEmail().equals("") && request.getUsername().equals("");
+
         String accountUsername;
 
         // authenticator ultimately works with username so transform the email given into a username if email
         // was chosen as the authentication mechanism
-        if (loginWithUsername) {
+        if (usernamePresent) {
+
             accountUsername = request.getUsername();
 
-        } else {
+        } else if (emailPresent) {
+
             Optional<User> userWithEmail = userRepository.findUserByEmail(request.getEmail());
 
             if (userWithEmail.isPresent()) {
@@ -84,6 +90,17 @@ public class AuthenticationService {
             } else {
                 throw new IllegalStateException("Account not found");
             }
+        } else if (userIdPresent) {
+
+            Optional<User> userWithId = userRepository.findById(request.getUserId());
+
+            if (userWithId.isPresent()) {
+                accountUsername = userWithId.get().getUsername();
+            } else {
+                throw new IllegalStateException("Account not found");
+            }
+        } else {
+            throw new IllegalStateException("Account details not provided");
         }
 
         authenticationManager.authenticate(

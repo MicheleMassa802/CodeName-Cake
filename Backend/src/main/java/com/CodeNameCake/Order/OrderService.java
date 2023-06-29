@@ -33,18 +33,16 @@ public class OrderService {
 
     @Autowired
     public OrderService(OrderRepository orderRepository, OrderDetailFieldService orderDetailFieldService,
-                        ShopService shopService) {
+            ShopService shopService) {
         this.orderRepository = orderRepository;
         this.orderDetailFieldService = orderDetailFieldService;
         this.shopService = shopService;
     }
 
-
-
     ////////////////////
     // PDF GET METHOD //
     ////////////////////
-    public void exportPDF(HttpServletResponse response, Long orderId){
+    public void exportPDF(HttpServletResponse response, Long orderId) {
         Document document = new Document(PageSize.A4);
         // get the order information based on orderId
 
@@ -59,7 +57,6 @@ public class OrderService {
 
             // writing on doc
             document.open();
-
 
             Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
             titleFont.setSize(24);
@@ -116,8 +113,8 @@ public class OrderService {
 
                 // get the beyond basic details in by groups:
 
-                Optional<HashMap<String, HashMap<String, String>>> groupedDetailsOptional =
-                        groupOrderDetails(order.getOrderDetails());
+                Optional<HashMap<String, HashMap<String, String>>> groupedDetailsOptional = groupOrderDetails(
+                        order.getOrderDetails());
                 HashMap<String, HashMap<String, String>> groupedDetails;
 
                 if (groupedDetailsOptional.isPresent()) {
@@ -175,7 +172,6 @@ public class OrderService {
             document.close();
 
         } catch (IOException e) {
-            System.out.println("Error generating receipt PDF");
             throw new RuntimeException(e);
         }
 
@@ -186,7 +182,8 @@ public class OrderService {
     ////////////////
     public List<List<OrderResponse>> getShopOrders(Long shopId, String term) {
         List<List<OrderResponse>> orderResponses = new ArrayList<>();
-        // each inner list is a possible chain of orders, each outer list is a whole order
+        // each inner list is a possible chain of orders, each outer list is a whole
+        // order
 
         List<Order> ordersPulled;
 
@@ -195,19 +192,21 @@ public class OrderService {
             ordersPulled = orderRepository.getOrdersByShopId(shopId);
         } else {
             // separate term into month and year
-            String [] monthYear = term.split("-");  // results in ["month", "year"]
+            String[] monthYear = term.split("-"); // results in ["month", "year"]
             ordersPulled = orderRepository.getTermOrdersByShopId(shopId, monthYear[1], monthYear[0]);
         }
 
-        // traverse the pulled orders and order them into their respective List<OrderResponse> objects
+        // traverse the pulled orders and order them into their respective
+        // List<OrderResponse> objects
         for (Order regularOrder : ordersPulled) {
 
             if (regularOrder.getAttachedFrontOrder() == null) {
                 // we are on a front order
-                List<Order> orderChain = getOrderChain(regularOrder);  // make up the order chain
+                List<Order> orderChain = getOrderChain(regularOrder); // make up the order chain
                 List<OrderResponse> orderResponseChain = new ArrayList<>();
 
-                // for each order in the chain, pull the details and make the orderResponse object
+                // for each order in the chain, pull the details and make the orderResponse
+                // object
                 for (Order order : orderChain) {
                     OrderResponse orderResponse = new OrderResponse(order,
                             orderDetailFieldService.getOrderDetails(order.getOrderId()));
@@ -222,16 +221,14 @@ public class OrderService {
         }
 
         // once done with all order chains ordered, return
-        return  orderResponses;
+        return orderResponses;
 
     }
-
 
     public List<Order> getTermShopOrders(Long shopId, String term) {
-        String [] monthYear = term.split("-");  // results in ["month", "year"]
+        String[] monthYear = term.split("-"); // results in ["month", "year"]
         return orderRepository.getTermOrdersByShopId(shopId, monthYear[1], monthYear[0]);
     }
-
 
     public List<OrderResponse> getSpecificOrder(Long orderId) {
         List<OrderResponse> orderResponseChain = new ArrayList<>();
@@ -249,9 +246,10 @@ public class OrderService {
         // set up the OrderResponse object based on the possible chain
         if (frontOrder.getAttachedFrontOrder() == null) {
             // we are on a front order
-            List<Order> orderChain = getOrderChain(frontOrder);  // make up the order chain
+            List<Order> orderChain = getOrderChain(frontOrder); // make up the order chain
 
-            // for each order in the chain, pull the details and make the orderResponse object
+            // for each order in the chain, pull the details and make the orderResponse
+            // object
             for (Order order : orderChain) {
                 OrderResponse orderResponse = new OrderResponse(order,
                         orderDetailFieldService.getOrderDetails(order.getOrderId()));
@@ -260,12 +258,12 @@ public class OrderService {
             }
 
         }
-        // otherwise skip (this technically won't happen as only front orders are displayed)
+        // otherwise skip (this technically won't happen as only front orders are
+        // displayed)
 
         // once done with all order chains ordered, return
-        return  orderResponseChain;
+        return orderResponseChain;
     }
-
 
     public List<List<OrderResponse>> getRelevantShopOrders(Long shopId) {
         // get the shop orders in decreasing deliveryDate order
@@ -275,21 +273,22 @@ public class OrderService {
             return new ArrayList<>();
         }
 
-        // start iterating through this list, and stop when you see today's date has passed (on the first element)
+        // start iterating through this list, and stop when you see today's date has
+        // passed (on the first element)
 
         List<List<OrderResponse>> closestDateOrders = new ArrayList<>();
-        // fill the empty spaces of orders that don't meet the 10 / 5 requirement with empty lists
+        // fill the empty spaces of orders that don't meet the 10 / 5 requirement with
+        // empty lists
 
         // today's date
         LocalDate todayLocal = LocalDate.now();
         Date today = Date.valueOf(todayLocal);
 
-        int firstPastIndex = sortedOrders.size();  // at most, no past orders are registered
+        int firstPastIndex = sortedOrders.size(); // at most, no past orders are registered
         int i;
         for (i = 0; i < sortedOrders.size(); i++) {
             // get the order's date and check if it's before today (past)
             java.util.Date orderDate = sortedOrders.get(i).get(0).getBasic().getDeliveryDate();
-            System.out.println("\n\n Today VS date: " + today + "---" + orderDate + "\n\n");
             if (orderDate.before(today)) {
                 // order date is in the past, so break out of the loop
                 firstPastIndex = i;
@@ -307,7 +306,7 @@ public class OrderService {
 
             // go one further order into the past
             pastIndex += 1;
-            pastCounter+= 1;
+            pastCounter += 1;
         }
 
         // check for if there's not enough past orders to fill in the first 5 spots
@@ -332,16 +331,13 @@ public class OrderService {
             closestDateOrders.add(new ArrayList<>());
         }
 
-
         return closestDateOrders;
     }
 
-
-
     public HashMap<String, Long> getOrderTypeCount(Long shopId, String term) {
-        String [] monthYear = term.split("-");  // results in ["month", "year"]
-        List<Object[]> termOrderTypeCounts =
-                orderRepository.countShopTermOrderTypes(shopId, monthYear[1], monthYear[0]);
+        String[] monthYear = term.split("-"); // results in ["month", "year"]
+        List<Object[]> termOrderTypeCounts = orderRepository.countShopTermOrderTypes(shopId, monthYear[1],
+                monthYear[0]);
 
         HashMap<String, Long> result = new HashMap<>();
 
@@ -353,12 +349,12 @@ public class OrderService {
     }
 
     public int getMaxShopTermOrderCost(Long shopId, String term) {
-        String [] monthYear = term.split("-");  // results in ["month", "year"]
+        String[] monthYear = term.split("-"); // results in ["month", "year"]
         return orderRepository.getShopTermMaxCostOrder(shopId, monthYear[1], monthYear[0]);
     }
 
     public int getShopTermIncome(Long shopId, String term) {
-        String [] monthYear = term.split("-");  // results in ["month", "year"]
+        String[] monthYear = term.split("-"); // results in ["month", "year"]
         return orderRepository.getShopTermIncome(shopId, monthYear[1], monthYear[0]);
     }
 
@@ -366,7 +362,7 @@ public class OrderService {
 
         Optional<java.util.Date> earliestOrderDate = orderRepository.getEarliestOrderTerm(shopId);
         if (earliestOrderDate.isPresent()) {
-            java.util.Date earliestOrderDeliveryDate =earliestOrderDate.get();
+            java.util.Date earliestOrderDeliveryDate = earliestOrderDate.get();
             // get term from that date and return it
             SimpleDateFormat dateFormat = new SimpleDateFormat("MM-yyyy");
             return dateFormat.format(earliestOrderDeliveryDate);
@@ -376,17 +372,19 @@ public class OrderService {
 
     }
 
-
-
     /////////////////
     // POST METHOD //
     /////////////////
     public void addOrder(OrderRequest order) {
-        // order comes into the system as a combination of a couple entities, including the order attributes themselves,
-        // and the OrderDetailField information, meaning that from this controller we perform the creation
-        // of information for 2 different tables in the database which are all at heart the same entity.
+        // order comes into the system as a combination of a couple entities, including
+        // the order attributes themselves,
+        // and the OrderDetailField information, meaning that from this controller we
+        // perform the creation
+        // of information for 2 different tables in the database which are all at heart
+        // the same entity.
 
-        // so first I'll use the json following the format outlined on the application's notion page to create
+        // so first I'll use the json following the format outlined on the application's
+        // notion page to create
         // the order object and save it
 
         LocalDate today = LocalDate.now();
@@ -397,12 +395,12 @@ public class OrderService {
                 dateReceived, order.getBasic().getDeliveryDate(),
                 order.getBasic().getClientContact(), order.getBasic().getExtraNotes(),
                 order.getBasic().getEstimatedCost(), order.getBasic().getOrderType(),
-                order.getBasic().getAttachedFrontOrder(), order.getBasic().getAttachedFrontOrder()
-        );
+                order.getBasic().getAttachedFrontOrder(), order.getBasic().getAttachedFrontOrder());
 
         orderRepository.save(basicOrderObject);
 
-        // now we get the id of this order we just created, and now we can start adding order details
+        // now we get the id of this order we just created, and now we can start adding
+        // order details
 
         Long orderId = basicOrderObject.getOrderId();
 
@@ -420,7 +418,6 @@ public class OrderService {
 
         // method is done by the time all details are added
     }
-
 
     public void mergeOrders(Long orderId1, Long orderId2) {
         // fetch the two orders
@@ -443,11 +440,14 @@ public class OrderService {
         // link successful
     }
 
-    /* Linking the front of order2 to the end of order1.
-    The preconditions for this function come from how the merging menu is structured in the FE:
-    ->  order1 & order2 .getAttachedFrontOrder() must be NULL : as the only way an order is displayed in the
-        FE is when they are at the front of their respective order chains.
-
+    /*
+     * Linking the front of order2 to the end of order1.
+     * The preconditions for this function come from how the merging menu is
+     * structured in the FE:
+     * -> order1 & order2 .getAttachedFrontOrder() must be NULL : as the only way an
+     * order is displayed in the
+     * FE is when they are at the front of their respective order chains.
+     * 
      */
     public void linkOrderObjects(Order order1, Order order2) {
 
@@ -466,12 +466,14 @@ public class OrderService {
             }
         }
 
-        // at this point, tempOrder is the last order in the order1 chain, so it's next must become
+        // at this point, tempOrder is the last order in the order1 chain, so it's next
+        // must become
         // order2's id
 
         tempOrder.setAttachedNextOrder(order2.getOrderId());
 
-        // set each of order2's chain of orders to have their .attachedFrontOrder to be order1.orderId
+        // set each of order2's chain of orders to have their .attachedFrontOrder to be
+        // order1.orderId
         Long newFront = order1.getOrderId();
 
         List<Order> ordersToUpdateChain2 = new ArrayList<>();
@@ -503,7 +505,8 @@ public class OrderService {
     // DELETE METHOD //
     ///////////////////
     public void deleteOrder(Long orderId) {
-        // this method can only be called with the orderId of the head of the orderChain as per how the FE works
+        // this method can only be called with the orderId of the head of the orderChain
+        // as per how the FE works
 
         // get the first order
         Optional<Order> orderChainFront = orderRepository.findById(orderId);
@@ -517,7 +520,8 @@ public class OrderService {
 
         List<Order> orderChain = getOrderChain(tempOrder);
 
-        // at this point all orders in the chain have been added to orderChain, so we now must get their
+        // at this point all orders in the chain have been added to orderChain, so we
+        // now must get their
         // respective order details, delete those, and then delete the order objects
         for (Order order : orderChain) {
             orderDetailFieldService.deleteOrderDetail(order.getOrderId());
@@ -525,7 +529,6 @@ public class OrderService {
         }
 
     }
-
 
     ////////////////
     // PUT METHOD //
@@ -545,26 +548,23 @@ public class OrderService {
             if (originalOrder.isPresent()) {
                 // take the delivery date that might get updated and make it into a localdate
                 LocalDate localDate = fullOrder.getBasic().getDeliveryDate().toInstant()
-                                .atZone(ZoneId.systemDefault()).toLocalDate();
+                        .atZone(ZoneId.systemDefault()).toLocalDate();
 
                 // Create a new Date object without the time component
                 Date resultDate = Date.valueOf(localDate);
-
 
                 // update the fields of the basic order and those of the order details
                 updatedOrder = originalOrder.get();
                 // don't update id, or shopId, or dateReceived, or orderType, or attachedOrders
                 updatedOrder.setOrderName(fullOrder.getBasic().getOrderName());
-                System.out.println("HERE " + fullOrder.getBasic().getDeliveryDate().toString());
                 updatedOrder.setDeliveryDate(resultDate);
                 updatedOrder.setClientContact(fullOrder.getBasic().getClientContact());
-                updatedOrder.setExtraNotes(fullOrder.getBasic().getClientContact());
+                updatedOrder.setExtraNotes(fullOrder.getBasic().getExtraNotes());
                 updatedOrder.setEstimatedCost(fullOrder.getBasic().getEstimatedCost());
 
                 // add to the list of orders and orderDetails to update
                 updatedOrders.add(updatedOrder);
                 updatedOrderDetails.add(fullOrder.getOrderDetails());
-
 
             } else {
                 throw new IllegalStateException("Order with ID " + fullOrder.getBasic().getOrderId()
@@ -576,14 +576,12 @@ public class OrderService {
         // save the changes (update the orders and orderDetails)
         for (int i = 0; i < updatedOrders.size(); i++) {
             orderRepository.save(updatedOrders.get(i));
-            System.out.println(updatedOrders.get(i).toString());
             for (OrderDetailField orderDetail : updatedOrderDetails.get(i)) {
                 // update each of the details for order i independently
                 orderDetailFieldService.updateOrderDetail(orderDetail);
             }
         }
     }
-
 
     ///////////////////
     // HELPER METHOD //
@@ -596,7 +594,8 @@ public class OrderService {
 
         Order tempOrder = order;
 
-        // for each new order in the chain until its end, add it to the chain to be deleted at the end
+        // for each new order in the chain until its end, add it to the chain to be
+        // deleted at the end
         while (tempOrder.getAttachedNextOrder() != null) {
             // fetch the next attached order and add it to the list until the order is null
             Optional<Order> middleOrder = orderRepository.findById(tempOrder.getAttachedNextOrder());
@@ -614,8 +613,7 @@ public class OrderService {
 
     }
 
-
-    public Optional<HashMap<String, HashMap<String, String>>> groupOrderDetails (List<OrderDetailField> orderDetails) {
+    public Optional<HashMap<String, HashMap<String, String>>> groupOrderDetails(List<OrderDetailField> orderDetails) {
 
         if (orderDetails.size() == 0) {
             return Optional.empty();
@@ -625,15 +623,17 @@ public class OrderService {
 
             HashMap<String, HashMap<String, String>> groupedDetails = new HashMap<>();
 
-            // for each detail, we split its name into its group and property with its corresponding value through the '--'
+            // for each detail, we split its name into its group and property with its
+            // corresponding value through the '--'
 
             for (OrderDetailField orderDetail : orderDetails) {
-                String[] splitName = orderDetail.getFieldName().split(" -- ");  // returns [group, property]
+                String[] splitName = orderDetail.getFieldName().split(" -- "); // returns [group, property]
                 String propertyValue = orderDetail.getFieldValue();
                 String groupName = splitName[0];
                 String propertyName = splitName[1];
 
-                // add a new key-value pair to the outer hashmap (a new group) if it's not already included
+                // add a new key-value pair to the outer hashmap (a new group) if it's not
+                // already included
                 if (!groupedDetails.containsKey(groupName)) {
                     HashMap<String, String> innerMap = new HashMap<>();
                     innerMap.put(propertyName, propertyValue);
@@ -647,7 +647,6 @@ public class OrderService {
 
         }
     }
-
 
     // custom response status
     @ResponseStatus(HttpStatus.BAD_REQUEST)

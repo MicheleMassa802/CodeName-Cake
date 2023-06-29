@@ -13,5 +13,7 @@ public class AuthenticationRequest {
 
     private String email;
     private String username;
+    private Long userId;  // not used in registration
     private String password;
+
 }

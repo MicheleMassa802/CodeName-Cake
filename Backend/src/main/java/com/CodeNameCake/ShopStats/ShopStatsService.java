@@ -196,14 +196,9 @@ public class ShopStatsService {
             if (isBefore((String) termIncome[1], term)) { // when terms are the same or db term is over, not counted
                 totalTerms += 1;
                 totalIncomeAvg += ((Number) termIncome[0]).intValue();
-                System.out.println("INFO " +
-                        " total Terms " + totalTerms +
-                        " term " + termIncome[1] +
-                        " termIncome " + termIncome[0]);
             }
 
         }
-
 
         pastIncomeAverages = totalIncomeAvg / totalTerms;
 

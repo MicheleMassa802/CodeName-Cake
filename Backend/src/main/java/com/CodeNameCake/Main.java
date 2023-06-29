@@ -12,7 +12,6 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-//        System.out.println("Hello Spring");
-        SpringApplication.run(Main.class, args);  // SpringBoot app runner
+        SpringApplication.run(Main.class, args); // SpringBoot app runner
     }
 }

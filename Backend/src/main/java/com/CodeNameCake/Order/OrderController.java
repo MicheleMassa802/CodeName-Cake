@@ -20,11 +20,11 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    // Get mapping for the pdf receipt requests (http://localhost:8080/api/dev/orders/getReceiptPdf/#)
+    // Get mapping for the pdf receipt requests
+    // (http://localhost:8080/api/dev/orders/getReceiptPdf/#)
     @GetMapping(path = "/getReceiptPdf/{orderId}")
     public void getReceiptPdf(@PathVariable("orderId") Long orderId, HttpServletResponse response) {
         response.setContentType("application/pdf");
-        System.out.println("Printing pdf for order " + orderId);
 
         // get datetime to identify pdf doc
         DateFormat dateFormatter = new SimpleDateFormat("yyy-MM-dd:hh:mm:ss");
@@ -50,7 +50,7 @@ public class OrderController {
 
     @GetMapping(path = "/getShopTermOrders/{shopId}/{term}")
     public List<List<OrderResponse>> getShopTermOrders(@PathVariable("shopId") Long shopId,
-                                         @PathVariable("term") String term) {
+            @PathVariable("term") String term) {
         return orderService.getShopOrders(shopId, term);
     }
 
@@ -66,23 +66,24 @@ public class OrderController {
 
     @PostMapping(path = "/merge/{orderId1}/{orderId2}")
     public void mergeOrders(@PathVariable("orderId1") Long orderId1,
-                            @PathVariable("orderId2") Long orderId2) {
+            @PathVariable("orderId2") Long orderId2) {
         orderService.mergeOrders(orderId1, orderId2);
     }
 
-    @DeleteMapping(path="/delete/{orderId}")
+    @DeleteMapping(path = "/delete/{orderId}")
     public void deleteOrder(@PathVariable("orderId") Long orderId) {
         orderService.deleteOrder(orderId);
     }
 
-    @PutMapping(path="/update")
+    @PutMapping(path = "/update")
     public void updateOrder(@RequestBody List<OrderResponse> orderUpdater) {
-        // order input given as a list of orderResponses as you first get the non-updated into the FE and once the user
+        // order input given as a list of orderResponses as you first get the
+        // non-updated into the FE and once the user
         // modifies that response list, it gets sent back
 
-        // orderUpdater already comes with its corresponding orderIds to get the original objects
+        // orderUpdater already comes with its corresponding orderIds to get the
+        // original objects
         orderService.updateOrder(orderUpdater);
     }
-
 
 }
