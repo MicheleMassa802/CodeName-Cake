@@ -119,71 +119,20 @@ const styles = StyleSheet.create({
 
     // Functions
 
-    // function to fetch existing order details for when editing mode is on
-    const fetchExistingOrder = async () => {
-        const endpoint = "orders/getOrderById/" + upperParams.orderId;
-
-        const headers = {
-            Authorization: `Bearer ${upperParams.token}`,
-            "Content-Type": "application/json",
-        };
-
-        const options = {
-            method: "GET",
-            headers: headers,
-        };
-
-        const response = await fetch(BASE_URL + endpoint, options)
-            .then(response => {
-                if (response.status === 403) {
-                    alert("Couldn't retrieve the order to edit, please try again later");
-                    props.navigation.pop({ 
-                        userId: upperParams.userId,
-                        shopId: upperParams.shopId,
-                        shopName: upperParams.shopName,
-                        colorway: upperParams.colorway,
-                        token: upperParams.token
-                        // no editing or anything else passed back
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log("Successfully retrieved order info ", data);
-                return data;
-            })
-            .catch(error => {
-                console.log("Error retrieving order info ", error);
-                alert("Couldn't retrieve the order to edit, please try again later");
-                props.navigation.pop({ 
-                    userId: upperParams.userId,
-                    shopId: upperParams.shopId,
-                    shopName: upperParams.shopName,
-                    colorway: upperParams.colorway,
-                    token: upperParams.token
-                    // no editing or anything else passed back
-                });
-            });
-
-        return response;
-
-    };
-
-
     // fetch content when component mounts
     useEffect(() => {
         const fetchData = async () => {
 
             // only perform when editing an order
-            
             if (editing) {
-                try {
-                    const data = await fetchExistingOrder();
-                    setBasic(data.basic);
-                    setOrderDetails(data.orderDetails);
-                } catch (error) {
-                    console.log(error);
-                }
+                setBasic(upperParams.orderObject[upperParams.chainPosition].basic);
+                // make the estimatedCost into a string
+                setBasic((prevBasic) => ({
+                    ...prevBasic,
+                    estimatedCost: prevBasic.estimatedCost.toString(),
+                }));
+
+                setOrderDetails(upperParams.orderObject[upperParams.chainPosition].orderDetails);
             }
             
         };
@@ -210,7 +159,7 @@ const styles = StyleSheet.create({
             return;
         }
         
-        console.log("Continueing to Order Details with order: ", JSON.stringify(basic), JSON.stringify(orderDetails));
+        // console.log("Continueing to Order Details with order: ", JSON.stringify(basic), JSON.stringify(orderDetails));
         // still not a fetch but pass on all the args so far
         
         // set estimatedCost to 0 if empty or to its respective integer value if not
@@ -221,11 +170,22 @@ const styles = StyleSheet.create({
         }
         console.log(JSON.stringify(basic));
 
-        props.navigation.push("AddOrderFurtherDetailsScreen", {
-            ...upperParams,
-            basic: basic,
-            orderDetails: upperParams.editing ? orderDetails : []
-        });
+
+        if (!upperParams.editing) {
+            props.navigation.push("AddOrderFurtherDetailsScreen", {
+                ...upperParams,
+                basic: basic,
+                orderDetails: {}
+            });
+        } else {
+            props.navigation.push("UpdateOrderFurtherDetailsScreen", {
+                ...upperParams,
+                basic: basic,
+                orderDetails: orderDetails
+            });
+        }
+
+
     };
 
     const toggleDatePicker = () => { 

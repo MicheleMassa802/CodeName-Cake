@@ -3,7 +3,7 @@ import { View, TextInput, StyleSheet, Text, TouchableOpacity, Pressable, Platfor
 import colors from '../../config/colors';
 import font_styles from '../../config/generics';
 import utils from '../../config/calendarUtil';
-
+import groupDetails from '../../config/orderViewUtil';
 import BASE_URL from '../../config/network';
 
 
@@ -115,43 +115,16 @@ function ViewReceiptScreen(props) {
     }
 
     const editOrder = () => {
-        console.log("Editing order");
+        console.log("Editing order in position " + upperParams.chainPosition);
         // go to order editing screen
-        upperParams.chainPosition = 0;  // reset to the first order in the chain when going to edit
         props.navigation.push("AddOrderScreen", {...upperParams, editing: true});
-    }
-
-    const groupDetails = (details) => {
-        const groupedDetails = {};
-
-        details.forEach((detail) => {
-            // for each detail, split its name into its group (such as "Cake Tier #0") and property
-            const splitName = detail.fieldName.split(" -- ");
-            const groupName = splitName[0];
-            const propertyName = splitName[1];
-            const propertyValue = detail.fieldValue;
-
-            // add the group to the groupedDetails object if it doesn't exist with the new property
-            if (!(groupName in groupedDetails)) {
-                groupedDetails[groupName] = { [propertyName] : propertyValue};
-            } else {
-                // otherwise, add the property to the group
-                groupedDetails[groupName][propertyName] = propertyValue;
-            }
-
-        });
-
-        console.log("Grouped details: ", groupedDetails);
-
-        return groupedDetails;
-
     }
 
     // Params and values to be displayed
     const chainPosition = upperParams.chainPosition;
 
     const basicOrderDetails = orderObject[chainPosition].basic;
-    const furtherOrderDetails = groupDetails(orderObject[chainPosition].orderDetails);
+    const furtherOrderDetails = groupDetails(orderObject[chainPosition].orderDetails, false); // details are not being edited here
     const futureOrder = utils.isFuture(basicOrderDetails.deliveryDate);
     const chainedOrder = basicOrderDetails.attachedNextOrder !== null; // true if the attachedOrder field in the order object is not null
     // means that another screen with the following suborder details should be displayed too

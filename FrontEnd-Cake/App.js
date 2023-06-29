@@ -14,6 +14,7 @@ import CalendarScreen from './app/screens/CalendarScreen';
 import AddOrderScreen from './app/screens/AddOrderScreen';
 import AddOrderFurtherDetailsScreen from './app/screens/AddOrderFurtherDetailsScreen';
 import ViewReceiptScreen from './app/screens/ViewReceiptScreen';
+import UpdateOrderFurtherDetailsScreen from './app/screens/UpdateOrderFurtherDetailsScreen';
 
 export default function App() {
 
@@ -44,6 +45,7 @@ export default function App() {
           <Stack.Screen name="AddOrderScreen" component={AddOrderScreen} options={{headerShown: false}}/>
           <Stack.Screen name="AddOrderFurtherDetailsScreen" component={AddOrderFurtherDetailsScreen} options={{headerShown: false}}/>
           <Stack.Screen name="ViewReceiptScreen" component={ViewReceiptScreen} options={{headerShown: false}}/>
+          <Stack.Screen name="UpdateOrderFurtherDetailsScreen" component={UpdateOrderFurtherDetailsScreen} options={{headerShown: false}}/>
 
         </Stack.Navigator>
 
