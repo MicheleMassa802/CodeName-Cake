@@ -49,7 +49,6 @@ const dateToString = (date) => {
 }
 
 const prevMonth = (monthInt) => {
-  console.log("Prev Month");
   if (monthInt !== 0) {
     return monthInt - 1;
   }
@@ -58,7 +57,6 @@ const prevMonth = (monthInt) => {
 } 
 
 const nextMonth = (monthInt) => {
-  console.log("Next Month");
   if (monthInt !== 11) {
     return monthInt + 1;
   }
@@ -67,7 +65,6 @@ const nextMonth = (monthInt) => {
 }
 
 const prevYear = (yearInt) => {
-  console.log("Prev Year");
   if (yearInt !== minYear) {
     return yearInt - 1;
   }
@@ -76,7 +73,6 @@ const prevYear = (yearInt) => {
 }
 
 const nextYear = (yearInt) => {
-  console.log("Next Year");
   if (yearInt !== maxYear) {
     return yearInt + 1;
   }

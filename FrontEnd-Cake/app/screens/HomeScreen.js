@@ -12,8 +12,6 @@ function HomeScreen(props) {
     const upperParams = props.route.params;
     const colorway = upperParams.colorway;
 
-    console.log("Params inherited: ", JSON.stringify(upperParams));
-
     const styles = StyleSheet.create({
         container: {
             flex: 1,

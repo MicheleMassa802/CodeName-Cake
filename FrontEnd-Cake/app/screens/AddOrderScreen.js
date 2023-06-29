@@ -12,8 +12,6 @@ function AddOrderScreen(props) {
     const upperParams = props.route.params;
     const colorway = upperParams.colorway;
 
-    // console.log("Params inherited: ", JSON.stringify(upperParams));
-
     // Styles
 const styles = StyleSheet.create({
     container: {
@@ -140,8 +138,6 @@ const styles = StyleSheet.create({
         fetchData();
     }, []);
 
-    // console.log("Data: ", basic.orderName, basic.deliveryDate, basic.clientContact, basic.extraNotes, basic.estimatedCost, basic.orderType, basic.orderDetails);
-
     const handleInputChange = (field, value) => {
         // function to leave the rest of the order as is and only update the field that changed
 
@@ -159,7 +155,6 @@ const styles = StyleSheet.create({
             return;
         }
         
-        // console.log("Continueing to Order Details with order: ", JSON.stringify(basic), JSON.stringify(orderDetails));
         // still not a fetch but pass on all the args so far
         
         // set estimatedCost to 0 if empty or to its respective integer value if not
@@ -168,8 +163,6 @@ const styles = StyleSheet.create({
         } else {
             basic.estimatedCost = parseInt(basic.estimatedCost);
         }
-        console.log(JSON.stringify(basic));
-
 
         if (!upperParams.editing) {
             props.navigation.push("AddOrderFurtherDetailsScreen", {

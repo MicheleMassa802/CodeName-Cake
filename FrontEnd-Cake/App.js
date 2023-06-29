@@ -18,8 +18,6 @@ import UpdateOrderFurtherDetailsScreen from './app/screens/UpdateOrderFurtherDet
 
 export default function App() {
 
-  console.log(StatusBar.currentHeight);
-
   const styles = StyleSheet.create({
     safeContainer: {
       flex: 1,

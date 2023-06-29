@@ -10,8 +10,6 @@ function ViewOrdersScreen(props) {
     const upperParams = props.route.params;
     const colorway = upperParams.colorway;
 
-    // console.log("Params inherited: ", JSON.stringify(upperParams));
-
     const styles = StyleSheet.create({
         container: {
             flex: 1,
@@ -131,7 +129,6 @@ function ViewOrdersScreen(props) {
     const getOrderContent = async () => {
         // fetch request to get the order content
         const endpoint = "orders/getRelevantShopOrders/" + upperParams.shopId;
-        console.log(`Fetching the order content for shop ${upperParams.shopId}`);
 
         const headers = {
             Authorization: `Bearer ${upperParams.token}`,
@@ -157,7 +154,6 @@ function ViewOrdersScreen(props) {
             try {
                 const data = await getOrderContent();
                 setOrderContent(data);  // set full orders list
-                console.log("Order content: ", JSON.stringify(data));
                 // transform to good format and set past and live orders (first 5 elements and last 10 respectively)
                 setPastOrderViewer(transformOrderFormat(data.slice(0, 5), false));
                 setLiveOrderViewer(transformOrderFormat(data.slice(5, 15), true));
@@ -224,9 +220,7 @@ function ViewOrdersScreen(props) {
     const goToOrder = (orderId) => {
         // go to the order screen with the selected orders
         console.log("Going to order: ", orderId);
-        console.log("Orders content: ", orderContent);
         let orderToGoTo = findOrderBody(orderId);
-        console.log("Order to go to: ", orderToGoTo);
         props.navigation.push("ViewReceiptScreen", {
             ...upperParams,
             orderId: orderId,
@@ -263,7 +257,6 @@ function ViewOrdersScreen(props) {
         // get the orderIds of the selected orders
         const order1Id = liveOrderViewer[selectedOrders[0]].id;
         const order2Id = liveOrderViewer[selectedOrders[1]].id;
-        console.log(`Merging orders ${order1Id} and ${order2Id}`);
         alert(`The merged orders will now fall under the date of the first order selected: ${liveOrderViewer[selectedOrders[0]].toDeliver}`);
 
         // fetch request to merge the orders
@@ -314,11 +307,9 @@ function ViewOrdersScreen(props) {
         selectedOrders.forEach((index) => {
             selectedObjects.push(liveOrderViewer[index].name);
         });
-        console.log("Selected Objects: ", selectedObjects);
         return selectedObjects;
     }
 
-    console.log("Selected Orders: ", selectedOrders);
     transformSelectedIndecesIntoObjects();
 
 

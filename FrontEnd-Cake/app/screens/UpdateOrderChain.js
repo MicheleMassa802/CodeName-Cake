@@ -32,8 +32,6 @@ function UpdateOrderChain(props) {
 
     });
 
-    console.log(orderObject);
-
     return (
         <View style={styles.container}>
             <View style={styles.titleBar}>

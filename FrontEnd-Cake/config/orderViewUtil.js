@@ -23,8 +23,6 @@ const groupDetails = (details, editing) => {
         }
     });
 
-    console.log("Grouped details: ", groupedDetails);
-
     return groupedDetails;
 };
 

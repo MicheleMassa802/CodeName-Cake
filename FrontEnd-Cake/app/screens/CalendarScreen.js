@@ -10,7 +10,6 @@ function CalendarScreen(props) {
     const upperParams = props.route.params;
     const colorway = upperParams.colorway;
 
-    // console.log("Params inherited: ", JSON.stringify(upperParams));
     const styles = StyleSheet.create({
         container: {
             flex: 1,
@@ -130,7 +129,7 @@ function CalendarScreen(props) {
             term = (month + 1) + "-" + year;
         }
         const endpoint = "orders/getShopTermOrders/" + upperParams.shopId + "/" + term;
-        console.log(`Fetching Orders for ${upperParams.shopName} during the period ${term}`);
+    
 
         const headers = {
             Authorization: `Bearer ${upperParams.token}`,
@@ -144,7 +143,6 @@ function CalendarScreen(props) {
 
         const response = await fetch(BASE_URL + endpoint, options);
         const data = await response.json();
-        // console.log("\n\nOrders: \n\n", JSON.stringify(data), "\n\n");
 
         return data;
     }
@@ -194,7 +192,6 @@ function CalendarScreen(props) {
     }
 
     const datePressed = (date) => {
-        console.log("Pressed on day " + date + " of " + utils.monthMap[month] + " " + year);
         setDay(date);
     }
 

@@ -29,7 +29,6 @@ function LoginScreen(props) {
     });
 
     const login = () => {
-        console.log(`Logging in with info: ${username}, ${email}, ${password}`);
         
         // check for empty fields
         if ((username === '' && email === '') || password === '') {
@@ -51,7 +50,8 @@ function LoginScreen(props) {
         const body = {
             username : username,
             email : email,
-            password : password
+            password : password,
+            userId: 0
         }
 
         const options = {
@@ -71,7 +71,7 @@ function LoginScreen(props) {
             })
             .then(async data => {
 
-                console.log(`Successfuly logged in to user: ${JSON.stringify(data)}`);
+                console.log(`Successfuly logged in!`);
 
                 // configure the shop stats
                 try {

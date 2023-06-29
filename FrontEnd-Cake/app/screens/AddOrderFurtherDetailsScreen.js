@@ -9,9 +9,7 @@ function AddOrderFurtherDetailsScreen(props) {
 
     const upperParams = props.route.params;
     const colorway = upperParams.colorway;
-    const basic = upperParams.basic;
 
-    // console.log("Params inherited: ", JSON.stringify(upperParams));
 
     // Styles
     const styles = StyleSheet.create({
@@ -186,7 +184,6 @@ function AddOrderFurtherDetailsScreen(props) {
     // States
     const [orderDetails, setOrderDetails] = useState(upperParams.orderDetails);
     const [orderTypeCounter, setOrderTypeCounter] = useState([0, 0, 0, 0, 0]);
-    // console.log("Details" + JSON.stringify(orderDetails));
 
     // Functions
     const addOrderDetail = (detailType) => {
@@ -239,7 +236,6 @@ function AddOrderFurtherDetailsScreen(props) {
     };
 
     const finishOrder = () => {
-        console.log("Finishing Order");
         // fetch request to backend to add order to database
         const orderEndpoint = "orders";
 
@@ -253,8 +249,6 @@ function AddOrderFurtherDetailsScreen(props) {
             basic : upperParams.basic,
             orderDetails : transformOrderDetailsToJson(),
         }
-
-        console.log("\n\n\n ORDER BODY \n\n " + JSON.stringify(orderBody) + "\n\n\n");
 
         const orderOptions = {
             method: "POST",

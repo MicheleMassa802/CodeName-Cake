@@ -10,10 +10,7 @@ function AddOrderFurtherDetailsScreen(props) {
 
     const upperParams = props.route.params;
     const colorway = upperParams.colorway;
-    const basic = upperParams.basic;
     const fullOrder = upperParams.orderObject;
-
-    // console.log("Params inherited: ", JSON.stringify(upperParams));
 
     // Styles
     const styles = StyleSheet.create({
@@ -212,11 +209,6 @@ function AddOrderFurtherDetailsScreen(props) {
     const [deletedOrderDetails, setDeletedOrderDetails] = useState([]);  // just the ids
     const [addedOrderDetails, setAddedOrderDetails] = useState({});  // the entire added objects
 
-    console.log("\n\n Order Details \n\n" + JSON.stringify(orderDetails) + "\n\n");
-    console.log("\n\n\nOG:  " + JSON.stringify(upperParams.orderDetails));
-    // console.log("\n\n\nDeleted Order Details: " + deletedOrderDetails);
-    // console.log("\n\n\nAdded Order Details: " + JSON.stringify(addedOrderDetails));
-
     // Functions
     const addOrderDetail = (detailType) => {
         // detailType MUST be one of the keys in detailObjects
@@ -333,7 +325,6 @@ function AddOrderFurtherDetailsScreen(props) {
     };
 
     const finishOrderUpdate = () => {
-        console.log("Finishing Order Update");
         // fetch request to backend to add order to database
         const orderEndpoint = "orders/update";
 
@@ -344,7 +335,6 @@ function AddOrderFurtherDetailsScreen(props) {
         };
 
         const orderBody = getModifiedOrderChain(upperParams.basic, getUpdatedOrderDetails());
-
         const orderOptions = {
             method: "PUT",
             headers: headers,
@@ -361,7 +351,6 @@ function AddOrderFurtherDetailsScreen(props) {
 
                     // proceed to remove the deleted orderDetails
                     deletedOrderDetails.forEach((id) => {
-                        console.log("Deleting order detail: " + id);
                         const deleteEndpoint = "orderDetails/" + id;
                         const deleteOptions = {
                             method: "DELETE",
@@ -389,7 +378,6 @@ function AddOrderFurtherDetailsScreen(props) {
                     const addEndpoint = "orderDetails";
                     
                     addedOrderDetailsJson.forEach((detail) => {
-                        console.log("Adding order detail: " + JSON.stringify(detail));
                         const addDetailOptions = {
                             method: "POST",
                             headers: headers,
@@ -421,9 +409,6 @@ function AddOrderFurtherDetailsScreen(props) {
                 alert("Error adding order: " + error);
         });
 
-
-
-
         // pop the two previous screens off the stack
         props.navigation.popToTop();
         props.navigation.push("HomeScreen", {
@@ -434,6 +419,7 @@ function AddOrderFurtherDetailsScreen(props) {
             token: upperParams.token
         })
     };
+
 
     // Screen
     return (

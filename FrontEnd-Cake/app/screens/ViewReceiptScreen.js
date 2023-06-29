@@ -1,5 +1,7 @@
-import {React, useState} from 'react';
+import {React, useCallback} from 'react';
 import { View, TextInput, StyleSheet, Text, TouchableOpacity, Pressable, Platform, ScrollView, Linking } from 'react-native';
+import { BackHandler } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import colors from '../../config/colors';
 import font_styles from '../../config/generics';
 import utils from '../../config/calendarUtil';
@@ -15,8 +17,6 @@ function ViewReceiptScreen(props) {
     const orderIdParam = upperParams.orderId;
 
     const orderObject = upperParams.orderObject;  // the order object to be displayed
-
-    console.log("Params inherited: ", JSON.stringify(upperParams));
     
     // Styles
     const styles = StyleSheet.create({
@@ -97,7 +97,6 @@ function ViewReceiptScreen(props) {
 
     const endpoint = "orders/getReceiptPdf/" + upperParams.orderId;
     const receiptUrl = BASE_URL + endpoint;
-    console.log("Receipt URL: ", receiptUrl);
 
     const openPDF = () => {
         // Note: pdf opening requires no authorization
@@ -115,7 +114,6 @@ function ViewReceiptScreen(props) {
     }
 
     const editOrder = () => {
-        console.log("Editing order in position " + upperParams.chainPosition);
         // go to order editing screen
         props.navigation.push("AddOrderScreen", {...upperParams, editing: true});
     }
@@ -129,6 +127,33 @@ function ViewReceiptScreen(props) {
     const chainedOrder = basicOrderDetails.attachedNextOrder !== null; // true if the attachedOrder field in the order object is not null
     // means that another screen with the following suborder details should be displayed too
 
+
+    // back handler for when going back mid-chain => going to home screen
+    useFocusEffect(
+        useCallback(() => {
+          const onBackPress = () => {
+            
+            props.navigation.popToTop();
+            props.navigation.push("HomeScreen", {
+                userId: upperParams.userId,
+                shopId: upperParams.shopId,
+                shopName: upperParams.shopName,
+                colorway: upperParams.colorway,
+                token: upperParams.token 
+            })
+            return true;
+          };
+      
+          BackHandler.addEventListener(
+            'hardwareBackPress', onBackPress
+          );
+      
+          return () =>
+            BackHandler.removeEventListener(
+              'hardwareBackPress', onBackPress
+            );
+        }, [])
+      );
 
     // Screen
     return (

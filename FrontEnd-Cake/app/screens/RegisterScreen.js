@@ -27,8 +27,6 @@ function RegisterScreen(props) {
     });
 
     const register = () => {
-        console.log(`Registering with info: ${username}, ${email}, ${shopName}, ${colorway}, ${password}`);
-        
         // check for empty fields
         if (username === '' || email === '' || shopName === '' || password === '') {
             alert('Please fill out all fields before registering!');
@@ -67,7 +65,6 @@ function RegisterScreen(props) {
             .then(respShopId => {
                 // with the value returned (shopId), set the shopId state
                 setShopId(respShopId);
-                console.log(`Shop creation successful with response: ${shopId}, ${respShopId}`);
 
                 const regBody = {
                     username: username,
@@ -88,7 +85,7 @@ function RegisterScreen(props) {
                     // no reason for it to return a 403 error here
                     .then(async data => {
                     
-                        console.log(`Registration successful with user: ${JSON.stringify(data)}`);
+                        console.log(`Registration successful!`);
 
                         // configure the shop stats
                         try {

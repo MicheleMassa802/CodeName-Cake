@@ -10,8 +10,6 @@ function StatsScreen(props) {
 
     const upperParams = props.route.params;
     const colorway = upperParams.colorway;
-
-    console.log("Params inherited: ", JSON.stringify(upperParams));
     
     const styles = StyleSheet.create({
         container: {
@@ -84,7 +82,6 @@ function StatsScreen(props) {
             term = (month + 1) + "-" + year;
         }
         const endpoint = "shopStats/" + upperParams.shopId + "/" + term;
-        console.log(`Fetching stats for ${upperParams.shopName} during the period ${term}`);
         const headers = {
             Authorization: `Bearer ${upperParams.token}`,
             'Content-Type': 'application/json'
@@ -97,7 +94,6 @@ function StatsScreen(props) {
 
         const response = await fetch(BASE_URL + endpoint, options);
         const data = await response.json();
-        console.log("Stats data: ", data);
 
         return data;
     }
