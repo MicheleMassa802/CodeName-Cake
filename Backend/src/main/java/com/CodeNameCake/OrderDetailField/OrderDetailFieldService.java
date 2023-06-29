@@ -27,6 +27,20 @@ public class OrderDetailFieldService {
         orderDetailFieldRepository.save(orderDetail);
     }
 
+    public void removeOrderDetail(Long orderDetailFieldId) {
+        // get the orderDetailField entity
+        Optional<OrderDetailField> orderDetailField = orderDetailFieldRepository.findById(orderDetailFieldId);
+
+        if (orderDetailField.isPresent()) {
+            orderDetailFieldRepository.delete(orderDetailField.get());
+        } else {
+            throw new IllegalStateException("Order Detail with ID " + orderDetailFieldId
+                    + " does not exist");
+        }
+
+
+    }
+
     public void deleteOrderDetail(Long orderId) {
         List<OrderDetailField> orderDetails = orderDetailFieldRepository.getOrderDetailsByOrderId(orderId);
         // delete all the retrieved objects
