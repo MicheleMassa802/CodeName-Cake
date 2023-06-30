@@ -1,6 +1,6 @@
 # CodeName-Cake
 
-Order Management System mobile application hosted through a react native front end on Expo App, with all of the code logic and collected data residing at a SpringBoot application and PostGreSQL database hosted through AWS.
+Order Management System mobile application hosted through a react native front end on Expo App, with all of the code logic and collected data residing at a SpringBoot application and PostGreSQL database hosted through Railway
 
 &nbsp;
 &nbsp;
@@ -11,8 +11,8 @@ Order Management System mobile application hosted through a react native front e
 - User Authentication and Authorization.
 - User and respective Shop profile.
 - Order Management based on dates and type of order.
-- Notification system when a registered order is close to its due date.
-- Automatic receipt generation for each order.
+- Dynamic order display when close to their due dates.
+- Automatic PDF receipt generation for each order.
 - Personalized order creation tools made specifically for cake and other baked goods orders.
 - Stat tracking for orders to keep the user informed on their progress.
 
@@ -23,8 +23,8 @@ Order Management System mobile application hosted through a react native front e
 # Instructions on accessing the application:
 
 - Download the Expo App on your mobile device.
-- Scan the QR code to be posted below with your phone's camera (or the Expo App's QR scanner):
-  - To be inserted here upon first release.
+- Scan the QR code to be posted below with your phone's camera (or the Expo App's QR scanner). This should add the application to your list of 'projects', letting you constantly access it without having to scan the QR code again:
+  <img src="./misc/Expo App.JPG" alt="LDM Diagram" width="1000"/>
 - Create an account following the instructions on the app or login with your credentials if you already have an account.
 - Manage your shop!
 
@@ -36,12 +36,8 @@ Order Management System mobile application hosted through a react native front e
 
 - This application is obviously divided into its front end and its back end. Part of the reason behind me doing this application is to practice my skills in the frameworks I've chosen as I am completely new to them. If it was for my own comfort I would just use Django and React and whip up a website in no time, but that wasn't the idea.
 - On the front end side, I've kept it simple and decided to make use of React Native as my framework of choice, and Expo as my development and deployment environment.
-- For the back end, I've gone with Spring Boot and PostGreSQL as my framework-database combination, and AWS as my hosting service.
-- The idea is to make use of Docker too in the actual deployment of the application, but that's to be kept for the future.
-
-## APIs & Libraries Used:
-
-- Here I'll list out the APIs and libraries I've used for this project, and I'll try to keep it updated as I go along.
+- For the back end, I've gone with Spring Boot and PostGreSQL as my framework-database combination, and Railway as my hosting service.
+- Docker was used for my back-end during development but is to be abandoned upon deployment.
 
 &nbsp;
 &nbsp;
@@ -49,12 +45,12 @@ Order Management System mobile application hosted through a react native front e
 
 # Architecture:
 
+- Package by feature type of architecture for the back end, grouping classes based on the entity they are associated with.
+
 ## Logical Data Model:
 
 - The LDM for the application is the following:
   <img src="./misc/LDM-Diagram.JPG" alt="LDM Diagram" width="1000"/>
-
-## System Breakdown:
 
 &nbsp;
 &nbsp;
@@ -79,7 +75,7 @@ Order Management System mobile application hosted through a react native front e
 - As a user I want to be able to create order details for an order. Order details can be one of the following, which each include the listed sub-details that can either be filled out or left blank:
 
   - Cake:
-    - tiers: list of tuples of the format <tier level (1 is the bottom) - tier cake flavor - tier filling flavor - tier covering (fondant or buttercream) - tier covering flavor (unlocked to customize as long as tier covering == buttercream)>. For this we just offer an ‘add new tier’ button to append new tiers to the existing list.
+    - tiers: list of tuples of the format <tier level (1 is the bottom) - tier cake flavor - tier filling flavor - tier covering (fondant or buttercream) - tier covering flavor>. For this we just offer an ‘add new tier’ button to append new tiers to the existing list.
     - decorations: list of tuples of the format <items - number of items - desctiption of items (all strings)>. For this we just offer an ‘add new decoration’ button to append new decorations to the existing list.
   - Cookies:
     - batches: list of tuples of the format <cookie type - # of cookies - flavor - filling - decoration description>. For this we just offer an ‘add new batch’ button to append new cookie batches to the existing list.
@@ -90,13 +86,11 @@ Order Management System mobile application hosted through a react native front e
     - if batch type item, create list of tuples of the format <baking good type - description> where the description can be a long string (text box like) detailing each of the details that we have on the default options and more.
     - if solo type item, just create a description text box for all details to be explained there.
 
-- As far as storing this, receipts are automatically made for each order, detailing all of the details and sent to our database. If a detail is not specified or skipped, ‘N/A’ is put in its place (e.g. if tier covering for a cake is fondant, tier covering flavor is included in the receipt but set to ‘N/A’).
+- As far as storing this, receipts are automatically made for each order, containning all of the details and sent to our database. If a detail is not specified or skipped, ‘null’ is put in its place (e.g. if tier covering for a cake is fondant, tier covering flavor is included in the receipt but set to ‘null’).
 
-- As a user I want to be able to modify an order object or delete it.
+- As a user I want to be able to modify an order object, including the order details associated with it.
 
 - As a user I want be able to see the orders I set up appear in my personal calendar. You can click on this calendar or on the order queue page to access an order to edit or delete.
-
-- As a user I want to be notified of the orders that are 10 and 5 days away from the delivery date, and on the delivery date.
 
 - As a user I want to be able to get a wrap of my stats throughout the year (such as orders per month, order type, money made, …).
 
@@ -108,6 +102,10 @@ Order Management System mobile application hosted through a react native front e
 
 - ~~Central Database (maybe this is the project that I make with SpringBoot) that keeps track of user accounts (so this is basically the online-ization of the application), and given the receipts for a user every once in a while, we collect some of the stats such as orders, order types, popular items, popular times of the year, … and we analyze them in order to provide the shop owner to know when and what they should try to optimize for given their client base~~. [Already being Implemented]
 
+- Rigurous testing of the application. At the moment I am not testing the application at all apart from just playing around with it and making sure the basic functionalities work and/or letting my 'test users' (my mom) play around with it and see if they find any bugs. So setting up unit tests for the application would be a good idea for the future when I have more time and want to make significant changes to the application.
+
+- Order migration endpoint that allows for users to get their orders as a CSV/txt file. I already implemented the PDF receipt system, but I would like, especially during the first couple deployments of this application where changes/resets to the database might still be fairly common, to allow for users to get their orders as a CSV/txt file so that they can keep track of them themselves in the case that I need to reset the system.
+
 - Given enough users make use of the application, we could allow for a marketplace type extension to the application where users can directly place orders into shops and have them be accepted or not (we would not deal with the money transfers though).
 
 - Generate a link to a website displaying the order status for users to share with their clients.
@@ -115,30 +113,3 @@ Order Management System mobile application hosted through a react native front e
 &nbsp;
 &nbsp;
 &nbsp;
-
-# Current Progress:
-
-- Setup & Brainstorm (2023-04-26 -> 2023-04-26)
-
-- Details (2023-04-27 -> 2023-04-27)
-
-- Learning React Native (2023-04-27 -> 2023-05-02)
-
-- Learning Spring Boot (2023-05-03 -> 2023-05-05)
-
-- TechStack & Arch & Initial Documentation (2023-05-08 -> 2023-05-08)
-
-- Start Project (2023-05-08 -> ...)
-
-  - Front End (React Native) (2023-05-08 -> 2023-05-21) Finished Screens, now onto the backend
-  - Back End (Spring Boot) (... -> ...)
-  - Front End & Back End Connection (Fetch requests for all screens that need them) (... -> ...)
-  - Front End (React Native) app structure tree (for moving between screens) (... -> ...)
-
-- Testing (... -> ...)
-
-- Deployment (... -> ...)
-
-- Final Documentation (... -> ...)
-
-- Maintenance (... -> ...)
