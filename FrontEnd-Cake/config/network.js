@@ -1,4 +1,4 @@
-const BASE_URL = "http://192.168.0.102:8080/api/dev/";
+const BASE_URL = "https://codename-cake-production.up.railway.app/api/dev/";
 
 export default BASE_URL;
 
