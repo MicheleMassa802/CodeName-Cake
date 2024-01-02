@@ -1,6 +1,6 @@
 server:
   #  to change the port the application is listening for requests on
-  port: 8080  # ==> find application at localhost:8000
+  port: 8080  # ==> find application at localhost:8443
   error:
     include-message: always
 

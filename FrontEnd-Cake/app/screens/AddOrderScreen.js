@@ -97,7 +97,12 @@ const styles = StyleSheet.create({
     const editing = upperParams.editing;
     
     // today = new Date - 4 hours -> string
-    const todayString = utils.getTodaysDate();
+    let todayString = utils.getTodaysDate();
+    const todayStringSplit = todayString.split('-')
+    if (todayStringSplit[2].length === 1) {
+        todayString = todayStringSplit[0] + "-" + todayStringSplit[1] + "-0" + todayStringSplit[2];
+    }
+    console.log(todayString);
 
     // States
     const [basic, setBasic] = useState({

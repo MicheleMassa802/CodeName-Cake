@@ -23,6 +23,7 @@ public class SecurityConfiguration {
         this.authenticationProvider = authenticationProvider;
     }
 
+
     @Bean
     @SuppressWarnings("removal")  // for the stupid fucking deprecation warnings, why can't you be like Django Spring
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{

@@ -44,6 +44,7 @@ function RegisterScreen(props) {
 
         const headers = {
             // Authorization: `Bearer ${bearerToken}`,
+            Accept: 'application/json',
             'Content-Type': 'application/json'
         };
 

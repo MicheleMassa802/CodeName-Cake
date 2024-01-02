@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "FrontEnd-Cake",
+    "name": "FrontEnd-Cake-Local",
     "slug": "FrontEnd-Cake",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -21,7 +21,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./app/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": ["INTERNET"]
     },
     "web": {
       "favicon": "./app/assets/kr/Favicon.png"

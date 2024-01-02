@@ -255,7 +255,7 @@ function AddOrderFurtherDetailsScreen(props) {
             headers: headers,
             body: JSON.stringify(orderBody)
         };
-
+        
         fetch(BASE_URL + orderEndpoint, orderOptions)
             .then(response => {
                 if (response.status === 403) {
