@@ -24,7 +24,7 @@ Order Management System mobile application hosted through a react native front e
 
 - Download the Expo App on your mobile device.
 - Scan the QR code to be posted below with your phone's camera (or the Expo App's QR scanner). This should add the application to your list of 'projects', letting you constantly access it without having to scan the QR code again:
-  <img src="./misc/Expo App V2.JPG" alt="App QR" width="1000"/>
+  <img src="./misc/Expo App V2.jpg" alt="App QR" width="1000"/>
 - Create an account following the instructions on the app or login with your credentials if you already have an account.
 - Manage your shop!
 
