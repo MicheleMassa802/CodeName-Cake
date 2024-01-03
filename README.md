@@ -113,3 +113,11 @@ Order Management System mobile application hosted through a react native front e
 &nbsp;
 &nbsp;
 &nbsp;
+
+# Important Notes:
+
+Note, all of the files in this project have been fully developed by me, Michele Massa, if you are interested in talking to me about coding, why I did something the way I did, or want to use a file, please ask for permission by shooting an email at: michelemassa802@gmail.com. It takes no effort and is a little nicer than just stealing the code. 
+
+All of the files under this project are copyrighted under copyright (c) 2022 Michele Massa. So please, ask for permission if you want to use my files.
+
+Aside from copying files, I am also not going to be open to collaboration in the project since it's more of a solo development thing that I really wanted to experience, if you have any recommendations as far as making it better however, or want to hire me to code something for you, once again shoot me an email at: michelemassa802@gmail.com.
